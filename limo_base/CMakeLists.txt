@@ -31,8 +31,8 @@ find_package(OpenCV REQUIRED)
 
 #TODO:
 include_directories(
-    /opt/ros2_ws/install/ugv_sdk/include/
-    /opt/ros2_ws/install/async_port/include/async_port/asio/include/
+    $ENV{HOME}/agilex_ws/install/ugv_sdk/include/
+    $ENV{HOME}/agilex_ws/install/async_port/include/async_port/asio/include/
 )
 
 file(GLOB_RECURSE SOURCE_FILES
@@ -51,7 +51,7 @@ include_directories(
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${HEADER_FILES})
-target_link_libraries(${PROJECT_NAME} /opt/ros2_ws/build/ugv_sdk/libugv_sdk.so /opt/ros2_ws/build/async_port/libasync_port.so)
+target_link_libraries(${PROJECT_NAME} $ENV{HOME}/agilex_ws/build/ugv_sdk/libugv_sdk.so $ENV{HOME}/agilex_ws/build/async_port/libasync_port.so)
 ament_target_dependencies(${PROJECT_NAME} ugv_sdk async_port  rclcpp tf2 tf2_ros limo_msgs std_msgs nav_msgs geometry_msgs sensor_msgs)
 
 add_executable(traffic_light_detect nodes/traffic_light_detect.cpp)
@@ -69,5 +69,20 @@ if(BUILD_TESTING)
   #set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+install(
+  DIRECTORY include
+  DESTINATION include
+)
+
+install(
+  TARGETS ${PROJECT_NAME} 
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(
+  DIRECTORY
+  launch DESTINATION share/${PROJECT_NAME}
+)
 
 ament_package()
