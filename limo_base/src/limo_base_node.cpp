@@ -22,14 +22,23 @@ int main(int argc, char* argv[]) {
 
   std::string port_name;
   rclcpp::Parameter parameter;
-  node->get_parameter("port_name", parameter);
-  port_name = parameter.as_string();
-  node->get_parameter("odom_frame", parameter);
-  messenger.odom_frame_ = parameter.as_string();
-  node->get_parameter("base_frame", parameter);
-  messenger.base_frame_=parameter.as_string();
-  node->get_parameter("odom_topic_name", parameter);
-  messenger.odom_topic_name_=parameter.as_string();
+
+  //TODO: use parameters
+  // node->get_parameter("port_name", parameter);
+  // port_name = parameter.as_string();
+  // node->get_parameter("odom_frame", parameter);
+  // messenger.odom_frame_ = parameter.as_string();
+  // node->get_parameter("base_frame", parameter);
+  // messenger.base_frame_=parameter.as_string();
+  // node->get_parameter("odom_topic_name", parameter);
+  // messenger.odom_topic_name_=parameter.as_string();
+
+  //TODO: 参数会导致程序崩溃，这里写死了
+  port_name="ttyTHS1";
+  messenger.odom_frame_="odom";
+  messenger.base_frame_="base_link";
+  messenger.odom_topic_name_="odom";
+
 
   messenger.SetupSubscription();
 
