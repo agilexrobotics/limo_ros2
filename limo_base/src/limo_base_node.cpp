@@ -51,13 +51,17 @@ int main(int argc, char* argv[]) {
     RCLCPP_INFO(node->get_logger(), "open the serial port: %s", port_name.c_str());
   }
 
-  rclcpp::Rate rate(50);
+  rclcpp::Rate rate(std::chrono::milliseconds(20));
   while (rclcpp::ok()) {
-    rclcpp::spin(node);
+    rclcpp::spin_some(node);
     messenger.PublishStateToROS();
     // robot->SetMotionCommand(0.1,0.38);
+
     rate.sleep();
   }
 
+  rclcpp::shutdown();
+
+  printf("limo base node exist\n");
   return 0;
 }

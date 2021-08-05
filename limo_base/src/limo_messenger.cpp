@@ -76,6 +76,9 @@ void LimoROSMessenger::LimoSettingCbk(
   RCLCPP_INFO(nh_->get_logger(), "got setting %d", msg->motion_mode);
 }
 void LimoROSMessenger::PublishStateToROS() {
+
+  printf("in publish:\n");
+
   current_time_ = rclcpp::Clock().now();
   double dt = (current_time_ - last_time_).seconds();
   static bool init_run = true;
@@ -144,6 +147,8 @@ void LimoROSMessenger::PublishStateToROS() {
   status_msg.x_linear_vel = x_v;
   status_msg.y_linear_vel = y_v;
   status_msg.motion_radius = radius;
+
+printf("publish\n");
 
   status_publisher_->publish(status_msg);
 
