@@ -22,20 +22,13 @@ double FilteVelocity(float data) {
   return data;
 }
 
-LimoROSMessenger::LimoROSMessenger(std::shared_ptr<rclcpp::Node> nh)
-    {
-  nh_ = nh;
-}
-LimoROSMessenger::LimoROSMessenger(LimoBase *limo,
-                                   std::shared_ptr<rclcpp::Node> nh)
-    : limo_(limo){
+LimoROSMessenger::LimoROSMessenger(std::shared_ptr<rclcpp::Node> nh) { nh_ = nh; }
+LimoROSMessenger::LimoROSMessenger(LimoBase *limo, std::shared_ptr<rclcpp::Node> nh) : limo_(limo) {
   nh_ = nh;
 }
 void LimoROSMessenger::SetupSubscription() {
-  odom_publisher_ =
-      nh_->create_publisher<nav_msgs::msg::Odometry>(odom_topic_name_, 50);
-  status_publisher_ =
-      nh_->create_publisher<limo_msgs::msg::LimoStatus>("/limo_status", 10);
+  odom_publisher_ = nh_->create_publisher<nav_msgs::msg::Odometry>(odom_topic_name_, 50);
+  status_publisher_ = nh_->create_publisher<limo_msgs::msg::LimoStatus>("/limo_status", 10);
   imu_publisher_ = nh_->create_publisher<sensor_msgs::msg::Imu>("/imu", 10);
 
   motion_cmd_sub_ = nh_->create_subscription<geometry_msgs::msg::Twist>(
@@ -44,10 +37,8 @@ void LimoROSMessenger::SetupSubscription() {
       "/limo_setting", 1, std::bind(&LimoROSMessenger::LimoSettingCbk, this, _1));
 }
 
-void LimoROSMessenger::TwistCmdCallback(
-    const geometry_msgs::msg::Twist::SharedPtr msg) {
-  RCLCPP_INFO(nh_->get_logger(), "get cmd %lf %lf", msg->linear.x,
-              msg->angular.z);
+void LimoROSMessenger::TwistCmdCallback(const geometry_msgs::msg::Twist::SharedPtr msg) {
+  RCLCPP_INFO(nh_->get_logger(), "get cmd %lf %lf", msg->linear.x, msg->angular.z);
 
   double steer_cmd = msg->angular.z;  // steer angle, in rad
   switch (motion_mode_) {
@@ -65,20 +56,15 @@ void LimoROSMessenger::TwistCmdCallback(
       limo_->SetMotionCommand(msg->linear.x, phi_i);
     } break;
     default:
-      RCLCPP_INFO(nh_->get_logger(),
-                  "motion mode not supported in receive cmd_vel");
+      RCLCPP_INFO(nh_->get_logger(), "motion mode not supported in receive cmd_vel");
       break;
   }
 }
-void LimoROSMessenger::LimoSettingCbk(
-    const limo_msgs::msg::LimoSetting::SharedPtr msg) {
+void LimoROSMessenger::LimoSettingCbk(const limo_msgs::msg::LimoSetting::SharedPtr msg) {
   // set motion mode
   RCLCPP_INFO(nh_->get_logger(), "got setting %d", msg->motion_mode);
 }
 void LimoROSMessenger::PublishStateToROS() {
-
-  printf("in publish:\n");
-
   current_time_ = rclcpp::Clock().now();
   double dt = (current_time_ - last_time_).seconds();
   static bool init_run = true;
@@ -135,8 +121,7 @@ void LimoROSMessenger::PublishStateToROS() {
       radius = r;
     } break;
     default:
-      RCLCPP_INFO(nh_->get_logger(), "motion mode not support: %d",
-                  motion_mode_);
+      RCLCPP_INFO(nh_->get_logger(), "motion mode not support: %d", motion_mode_);
       break;
   }
 
@@ -147,8 +132,6 @@ void LimoROSMessenger::PublishStateToROS() {
   status_msg.x_linear_vel = x_v;
   status_msg.y_linear_vel = y_v;
   status_msg.motion_radius = radius;
-
-printf("publish\n");
 
   status_publisher_->publish(status_msg);
 
@@ -168,23 +151,26 @@ void LimoROSMessenger::GenerateImuMsg(const LimoState &state) {
   imu_data_.header.frame_id = "imu_link";
 
   imu_data_.linear_acceleration.x = state.imu_accel_.accel_x;
-  imu_data_.linear_acceleration.y = state.imu_accel_.accel_y;
-  imu_data_.linear_acceleration.z = state.imu_accel_.accel_z;
+  imu_data_.linear_acceleration.y = -state.imu_accel_.accel_y;
+  imu_data_.linear_acceleration.z = -state.imu_accel_.accel_z;
 
   imu_data_.angular_velocity.x = state.imu_gyro_.gyro_x * DEG_TO_RAD;
-  imu_data_.angular_velocity.y = state.imu_gyro_.gyro_y * DEG_TO_RAD;
-  imu_data_.angular_velocity.z = state.imu_gyro_.gyro_z * DEG_TO_RAD;
+  imu_data_.angular_velocity.y = -state.imu_gyro_.gyro_y * DEG_TO_RAD;
+  imu_data_.angular_velocity.z = -state.imu_gyro_.gyro_z * DEG_TO_RAD;
 
-  printf("%f, %f, %f\n", state.imu_euler_.roll, state.imu_euler_.pitch,
-         state.imu_euler_.yaw);
+  printf("%f, %f, %f\n", state.imu_euler_.roll, -state.imu_euler_.pitch, -state.imu_euler_.yaw);
+
+  // the IMU rotate along the x axis 180 degree
   tf2::Quaternion q;
-  q.setRPY(state.imu_euler_.roll * DEG_TO_RAD,
-           state.imu_euler_.pitch * DEG_TO_RAD,
+  q.setRPY(state.imu_euler_.roll * DEG_TO_RAD, state.imu_euler_.pitch * DEG_TO_RAD,
            state.imu_euler_.yaw * DEG_TO_RAD);
-  imu_data_.orientation.x = q.x();
-  imu_data_.orientation.y = q.y();
-  imu_data_.orientation.z = q.z();
-  imu_data_.orientation.w = q.w();
+  tf2::Quaternion q2(1, 0, 0, 0);
+  tf2::Quaternion q_trans = q2 * q;
+
+  imu_data_.orientation.x = q_trans.x();
+  imu_data_.orientation.y = q_trans.y();
+  imu_data_.orientation.z = q_trans.z();
+  imu_data_.orientation.w = q_trans.w();
 
   imu_data_.linear_acceleration_covariance[0] = 1.0f;
   imu_data_.linear_acceleration_covariance[4] = 1.0f;
@@ -198,18 +184,15 @@ void LimoROSMessenger::GenerateImuMsg(const LimoState &state) {
   imu_data_.orientation_covariance[4] = 1e-6;
   imu_data_.orientation_covariance[8] = 1e-6;
 }
-void LimoROSMessenger::PublishOdometryToROS(double linear, double angle_vel,
-                                            double x_linear_vel,
+void LimoROSMessenger::PublishOdometryToROS(double linear, double angle_vel, double x_linear_vel,
                                             double y_linear_vel, double dt) {
   linear_speed_ = linear;
   angular_speed_ = angle_vel;
   x_linear_vel_ = x_linear_vel;
   y_linear_vel_ = y_linear_vel;
 
-  position_x_ +=
-      cos(theta_) * x_linear_vel_ * dt - sin(theta_) * y_linear_vel_ * dt;
-  position_y_ +=
-      sin(theta_) * x_linear_vel_ * dt + cos(theta_) * y_linear_vel_ * dt;
+  position_x_ += cos(theta_) * x_linear_vel_ * dt - sin(theta_) * y_linear_vel_ * dt;
+  position_y_ += sin(theta_) * x_linear_vel_ * dt + cos(theta_) * y_linear_vel_ * dt;
   theta_ += angular_speed_ * dt;
 
   if (theta_ > M_PI) {
@@ -221,7 +204,7 @@ void LimoROSMessenger::PublishOdometryToROS(double linear, double angle_vel,
   // printf("angle: %f\n\n", theta_ / M_PI * 180.0);
 
   tf2::Quaternion odom_quat;
-  odom_quat.setRPY(0,0,theta_);
+  odom_quat.setRPY(0, 0, theta_);
 
   static tf2_ros::TransformBroadcaster tf_broadcaster_(nh_);
 
@@ -281,12 +264,10 @@ double LimoROSMessenger::ConvertCentralAngleToInner(double angle) {
   double phi = angle;
   double phi_i = 0.0;
   if (phi > steer_angle_tolerance) {
-    phi_i =
-        std::atan(l * std::sin(phi) / (l * std::cos(phi) - w * std::sin(phi)));
+    phi_i = std::atan(l * std::sin(phi) / (l * std::cos(phi) - w * std::sin(phi)));
   } else if (phi < -steer_angle_tolerance) {
     phi = -phi;
-    phi_i =
-        std::atan(l * std::sin(phi) / (l * std::cos(phi) - w * std::sin(phi)));
+    phi_i = std::atan(l * std::sin(phi) / (l * std::cos(phi) - w * std::sin(phi)));
     phi_i = -phi_i;
   }
   return phi_i;

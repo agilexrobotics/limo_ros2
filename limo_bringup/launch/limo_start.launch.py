@@ -21,9 +21,9 @@ def generate_launch_description():
             default_value='false'
         ),
         launch_ros.actions.Node(
-            package='rviz',
-            name='rviz',
-            node_executable='rviz',
+            package='rviz2',
+            name='rviz2',
+            node_executable='rviz2',
             on_exit=launch.actions.Shutdown(),
             condition=launch.conditions.IfCondition(
                 launch.substitutions.LaunchConfiguration('open_rviz'))
@@ -32,21 +32,21 @@ def generate_launch_description():
             package='tf2_ros',
             node_executable='static_transform_publisher',
             name='base_link_to_imu',
-            arguments=["0.0 0.0 0.0 0.0 0.0 0.0 /base_link /imu_link 10"]
+            arguments="0.0 0.0 0.0 0.0 0.0 0.0 /base_link /imu_link".split(' ')
         ),
-        launch_ros.actions.Node(
-            package='robot_pose_ekf',
-            node_executable='robot_pose_ekf',
-            name='robot_pose_ekf',
-            parameters=[
-                {
-                    'output_frame': 'odom'
-                },
-                {
-                    'base_footprint_frame': 'base_link'
-                }
-            ]
-        ),
+        # launch_ros.actions.Node(
+        #     package='robot_pose_ekf',
+        #     node_executable='robot_pose_ekf',
+        #     name='robot_pose_ekf',
+        #     parameters=[
+        #         {
+        #             'output_frame': 'odom'
+        #         },
+        #         {
+        #             'base_footprint_frame': 'base_link'
+        #         }
+        #     ]
+        # ),
         launch.actions.IncludeLaunchDescription(
             launch.launch_description_sources.PythonLaunchDescriptionSource(
                 os.path.join(get_package_share_directory(
@@ -57,12 +57,12 @@ def generate_launch_description():
                 'odom_topic_name': launch.substitutions.LaunchConfiguration('odom_topic_name')
             }.items()
         ),
-        # launch.actions.IncludeLaunchDescription(
-        #     launch.launch_description_sources.PythonLaunchDescriptionSource(
-        #         os.path.join(get_package_share_directory(
-        #             'ydlidar_ros'), 'launch/X2L.launch.py')
-        #     )
-        # )
+        launch.actions.IncludeLaunchDescription(
+            launch.launch_description_sources.PythonLaunchDescriptionSource(
+                os.path.join(get_package_share_directory(
+                    'ydlidar_ros'), 'launch/X2L.launch.py')
+            )
+        )
     ])
     return ld
 
