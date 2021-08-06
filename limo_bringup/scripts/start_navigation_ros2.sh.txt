@@ -1,7 +1,8 @@
-#!/bin/bash
+
+下面的脚本一条一条运行， 注意不能在后台运行
 
 # 启动底盘
-ros2 launch limo_bringup limo_start.launch.py &
+ros2 launch limo_bringup limo_start.launch.py
 sleep 2
 # 启动导航
 ros2 launch limo_bringup limo_navigation.launch.py
