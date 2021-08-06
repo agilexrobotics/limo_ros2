@@ -1,7 +1,7 @@
 image: limo.pgm
-resolution: 0.050000
-origin: [-4.900368, -1.350000, 0.000000]
+mode: trinary
+resolution: 0.05
+origin: [-3.09, -7.29, 0]
 negate: 0
 occupied_thresh: 0.65
-free_thresh: 0.196
-
+free_thresh: 0.169

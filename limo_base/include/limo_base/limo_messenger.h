@@ -33,7 +33,7 @@ class LimoROSMessenger {
   std::string odom_frame_;
   std::string base_frame_;
   std::string odom_topic_name_;
-  bool pub_odom_tf_{false};
+  bool pub_odom_tf_{true};
 
   int sim_control_rate_ = 50;
 
