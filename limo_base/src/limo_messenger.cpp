@@ -158,7 +158,7 @@ void LimoROSMessenger::GenerateImuMsg(const LimoState &state) {
   imu_data_.angular_velocity.y = -state.imu_gyro_.gyro_y * DEG_TO_RAD;
   imu_data_.angular_velocity.z = -state.imu_gyro_.gyro_z * DEG_TO_RAD;
 
-  printf("%f, %f, %f\n", state.imu_euler_.roll, -state.imu_euler_.pitch, -state.imu_euler_.yaw);
+  // printf("%f, %f, %f\n", state.imu_euler_.roll, -state.imu_euler_.pitch, -state.imu_euler_.yaw);
 
   // the IMU rotate along the x axis 180 degree
   tf2::Quaternion q;

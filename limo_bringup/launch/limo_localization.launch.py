@@ -68,15 +68,6 @@ def generate_launch_description():
             description='Arguments to pass to all nodes launched by the file'),
 
         Node(
-            package='nav2_map_server',
-            node_executable='map_server',
-            node_name='map_server',
-            output='screen',
-            parameters=[configured_params],
-            use_remappings=IfCondition(use_remappings),
-            remappings=remappings),
-
-        Node(
             package='nav2_amcl',
             node_executable='amcl',
             node_name='amcl',
@@ -93,5 +84,14 @@ def generate_launch_description():
             output='screen',
             parameters=[{'use_sim_time': use_sim_time},
                         {'autostart': autostart},
-                        {'node_names': ['map_server', 'amcl']}])
+                        {'node_names': ['map_server', 'amcl']}]),
+        
+        Node(
+            package='nav2_map_server',
+            node_executable='map_server',
+            node_name='map_server',
+            output='screen',
+            parameters=[configured_params],
+            use_remappings=IfCondition(use_remappings),
+            remappings=remappings),
     ])

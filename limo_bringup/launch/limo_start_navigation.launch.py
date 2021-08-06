@@ -53,15 +53,6 @@ def generate_launch_description():
         'use_remappings', default_value='false',
         description='Arguments to pass to all nodes launched by the file')
 
-    start_localization_cmd = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(launch_dir, 'limo_localization.launch.py')),
-        launch_arguments={'namespace': namespace,
-                          'map': map_yaml_file,
-                          'use_sim_time': use_sim_time,
-                          'autostart': autostart,
-                          'params_file': params_file,
-                          'use_lifecycle_mgr': 'false',
-                          'use_remappings': use_remappings}.items())
 
     start_navigation_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(launch_dir, 'limo_navigation.launch.py')),
@@ -74,6 +65,16 @@ def generate_launch_description():
                           'use_remappings': use_remappings,
                           'map_subscribe_transient_local': 'true'}.items())
 
+    start_localization_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(os.path.join(launch_dir, 'limo_localization.launch.py')),
+        launch_arguments={'namespace': namespace,
+                          'map': map_yaml_file,
+                          'use_sim_time': use_sim_time,
+                          'autostart': autostart,
+                          'params_file': params_file,
+                          'use_lifecycle_mgr': 'false',
+                          'use_remappings': use_remappings}.items())
+                          
     start_lifecycle_manager_cmd = Node(
         package='nav2_lifecycle_manager',
         node_executable='lifecycle_manager',
