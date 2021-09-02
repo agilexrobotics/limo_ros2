@@ -10,6 +10,7 @@ devel
 a
 version.cc
 logs
+.vscode
 
 ####################################################### qt
 # C++ objects and libs
