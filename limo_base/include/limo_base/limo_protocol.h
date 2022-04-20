@@ -27,30 +27,80 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include "limo_base/limo_driver.h"
-using namespace AgileX;
-std::shared_ptr<LimoDriver> robot;
 
-// int main(int argc, char **argv) {
-//     rclcpp::init(argc, argv);
-//     AgileX::LimoDriver driver; 
-//     rclcpp::spin(std::make_shared<LimoDriver>());
-//     rclcpp::Rate rate(50);
-//     rate.sleep();
-//     rclcpp::shutdown();
-//     return 0;
-// }
+#ifndef LIMO_PROTOCOL_PARSER_H
+#define LIMO_PROTOCOL_PARSER_H
 
-int main(int argc, char **argv) {
-  // setup ROS node
-  rclcpp::init(argc, argv);
-  //   std::signal(SIGINT, DetachRobot);
+#include <stdint.h>
 
-  // robot = std::make_shared<LimoDriver>("limo_base");
-  rclcpp::spin(std::make_shared<LimoDriver>("limo_base"));
-  rclcpp::Rate rate(100);
-  rate.sleep();
-  rclcpp::shutdown();
+namespace AgileX {
 
-  return 0;
+#define FRAME_HEADER 0x55
+#define FRAME_LENGTH 0x0E
+
+/*--------------------------- Message IDs ------------------------------*/
+// control group: 0x1
+#define MSG_MOTION_COMMAND_ID 0x111
+
+// state feedback group: 0x2
+#define MSG_SYSTEM_STATE_ID 0x211
+#define MSG_MOTION_STATE_ID 0x221
+
+#define MSG_ACTUATOR1_HS_STATE_ID 0x251
+#define MSG_ACTUATOR2_HS_STATE_ID 0x252
+#define MSG_ACTUATOR3_HS_STATE_ID 0x253
+#define MSG_ACTUATOR4_HS_STATE_ID 0x254
+
+#define MSG_ACTUATOR1_LS_STATE_ID 0x261
+#define MSG_ACTUATOR2_LS_STATE_ID 0x262
+#define MSG_ACTUATOR3_LS_STATE_ID 0x263
+#define MSG_ACTUATOR4_LS_STATE_ID 0x264
+
+// sensor data group: 0x3
+#define MSG_ODOMETRY_ID  0x311
+#define MSG_IMU_ACCEL_ID 0x321
+#define MSG_IMU_GYRO_ID  0x322
+#define MSG_IMU_EULER_ID 0x323
+
+#define MSG_CTRL_MODE_CONFIG_ID 0x421
+
+// limo protocol data format
+typedef struct {
+    double stamp;
+    uint16_t id;
+    uint8_t data[8];
+    uint8_t count;
+} LimoFrame;
+
+typedef struct {
+    double accel_x;
+    double accel_y;
+    double accel_z;
+    double gyro_x;
+    double gyro_y;
+    double gyro_z;
+    double roll;
+    double pitch;
+    double yaw;
+} ImuData;
+
+enum {
+    LIMO_WAIT_HEADER = 0,
+    LIMO_WAIT_LENGTH,
+    LIMO_WAIT_ID_HIGH,
+    LIMO_WAIT_ID_LOW,
+    LIMO_WAIT_DATA,
+    LIMO_COUNT,
+    LIMO_CHECK,
+};
+
+enum {
+    MODE_FOUR_DIFF = 0x00,
+    MODE_ACKERMANN = 0x01,
+    MODE_MCNAMU = 0x02,
+    MODE_UNKNOWN = 0xff,
+};
+
 }
+
+#endif  // LIMO_PROTOCOL_H
