@@ -1,0 +1,3 @@
+[submodule "ydlidar_ros2"]
+	path = ydlidar_ros2
+	url = https://github.com/YDLIDAR/ydlidar_ros2_driver
