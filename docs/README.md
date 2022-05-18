@@ -11,23 +11,48 @@ Password `agx`
 
 `Install nomachine : https://www.nomachine.com/download/download&id=115&s=ARM`
 
-The wired connection address is configured as 192.168.1.3, gateway 192.168.1.1
+The wired connection address is configured as 192.168.1.3, gateway 192.168.1.1   
 
 ## Create workspace
+*Note if you are doing this on the existing AgileX image with ros melodic, create a workspace called agilex_ros2_ws instead and substitute every agilex_ws below with agilex_ros2_ws*
+
 ```
 mkdir ~/agilex_ws
 cd ~/agilex_ws
 mkdir src
 cd src
-git clone https://github.com/agilexrobotics/limo_ros2.git
+git clone --recursive https://github.com/agilexrobotics/limo_ros2.git
 cd ..
 ```
+
+## Install YDlidarSDK
+```
+cd ~
+git clone https://github.com/YDLIDAR/YDLidar-SDK.git
+cd YDLIDAR/YDLidar-SDK
+mkdir build
+cd build
+cmake ..
+make
+sudo make install
+cd ~/agilex_ws
+```
+
 
 ## Install ROS2 Eloquent
 
 First follow these instructions https://docs.ros.org/en/eloquent/Installation/Linux-Install-Debians.html to install ROS2 Eloquent
 
 `sudo apt install python3-colcon-core`
+
+
+## Setup Agilex Workspace
+
+```
+cd ~/agilex_ws
+source /opt/ros/eloquent/setup.bash
+colcon build
+```
 
 ## Setup ~/.bashrc for environment configuration
 
@@ -46,6 +71,8 @@ echo agx | sudo -S chmod 666 /dev/ttyTHS1
 ## Install RMW 
 
 `sudo apt install ros-eloquent-rmw-fastrtps*`
+
+
 
 ## Install Nav2 :
 `sudo apt install ros2-eloquent-nav2 ros-eloquent-nav2-amcl ros-eloquent-nav2*`
