@@ -14,15 +14,18 @@ Password `agx`
 The wired connection address is configured as 192.168.1.3, gateway 192.168.1.1   
 
 ## Create workspace
-*Note if you are doing this on the existing AgileX image with ros melodic, create a workspace called agilex_ros2_ws instead and substitute every agilex_ws below with agilex_ros2_ws*
+*Note if you are doing this on the existing AgileX image with ros melodic, create a workspace called agilex_ros2_ws - in the Chinese version of the documentation they called their workspace agilex_ws which collides with the Limo melodic workspace*
 
 ```
-mkdir ~/agilex_ws
-cd ~/agilex_ws
+mkdir ~/agilex_ros2_ws
+cd ~/agilex_ros2_ws
 mkdir src
 cd src
 git clone --recursive https://github.com/agilexrobotics/limo_ros2.git
-cd ..
+cd limo_ros2
+rm ydlidar_ros2/params/ydlidar.yaml
+ls -s limo_bringup/param/ydlidar.yaml ydlidar_ros2/params/ydlidar.yaml
+cd ~/agilex_ros2_ws
 ```
 
 ## Install YDlidarSDK
@@ -35,7 +38,7 @@ cd build
 cmake ..
 make
 sudo make install
-cd ~/agilex_ws
+cd ~/agilex_ros2_ws
 ```
 
 
@@ -49,7 +52,7 @@ First follow these instructions https://docs.ros.org/en/eloquent/Installation/Li
 ## Setup Agilex Workspace
 
 ```
-cd ~/agilex_ws
+cd ~/agilex_ros2_ws
 source /opt/ros/eloquent/setup.bash
 colcon build
 ```
@@ -62,8 +65,8 @@ Append the following to your boot
 ## ros2
 export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 source /opt/ros/eloquent/setup.bash
-source /home/agilex/agilex_ws/install/setup.bash
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${HOME}/agilex_ws/install/ugv_sdk/lib/ugv_sdk/:${HOME}/agilex_ws/install/async_port/lib/async_port:/opt/ros/eloquent/lib/:/usr/ local/lib/
+source /home/agilex/agilex_ros2_ws/install/setup.bash
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${HOME}/agilex_ws/install/ugv_sdk/lib/ugv_sdk/:${HOME}/agilex_ros2_ws/install/async_port/lib/async_port:/opt/ros/eloquent/lib/:/usr/ local/lib/
 
 echo agx | sudo -S chmod 666 /dev/ttyTHS1
 ```
