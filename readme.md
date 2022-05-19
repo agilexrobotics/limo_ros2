@@ -1,5 +1,5 @@
 
-下面的脚本一条一条运行， 注意不能在后台运行  After installing ROS2 Eloquent (see docs) and setting up the software and environment run the following scripts one by one, being careful not to run in the background
+下面的脚本一条一条运行， 注意不能在后台运行  After installing ROS2 Eloquent [see documents here](docs/README.md) and setting up the software and environment run the following scripts one by one, being careful not to run in the background
 
 # 导航 Navigation
 
