@@ -46,8 +46,9 @@ cd ~/agilex_ros2_ws
 
 First follow these instructions https://docs.ros.org/en/eloquent/Installation/Linux-Install-Debians.html to install ROS2 Eloquent
 
+Then add colcon and ros2 cartographer
 `sudo apt install python3-colcon-core`
-
+`sudo apt install ros-eloquent-cartographer`
 
 ## Setup Agilex Workspace
 
@@ -78,7 +79,7 @@ echo agx | sudo -S chmod 666 /dev/ttyTHS1
 
 
 ## Install Nav2 :
-`sudo apt install ros2-eloquent-nav2 ros-eloquent-nav2-amcl ros-eloquent-nav2*`
+`sudo apt install ros2-eloquent-navigation2 ros-eloquent-nav2-amcl ros-eloquent-nav2*`
 
 To launch run `ros2 launch build_map_2d revo_build_map_2d.launch.py`
 
