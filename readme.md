@@ -1,4 +1,4 @@
-真机运行：Running on the Jetson Nano:
+# 真机运行：Running on the Jetson Nano:
 # 克隆仓库
 ```shell
 # 创建本地工作目录 Create local workspace
@@ -11,12 +11,12 @@ git clone https://github.com/agilexrobotics/limo_ros2.git src
 
 mv ~/agx_workspace/src/.devcontainer ~/agx_workspace
 ```
-# 【推荐】使用 VS Code remote 插件 连接到 limo，打开 ~/agx_workspace 后在菜单中选择 reopen in container
-# [Recommend] Login the limo via VS Code remote plugin, open ~/agx_workspace.Then select reopen in container in the menu
+``【推荐】使用 VS Code remote 插件 连接到 limo，打开 ~/agx_workspace 后在菜单中选择 reopen in container``
+ ``[Recommend] Login the limo via VS Code remote plugin, open ~/agx_workspace.Then select reopen in container in the menu``
 
 
 
-# 或运行自动配置脚本 Or running automatically setup script
+``或运行自动配置脚本 Or running automatically setup script``
 ```shell
 cd ~/agx_workspace/src
 chmod +x setup.sh
