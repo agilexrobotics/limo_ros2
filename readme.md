@@ -1,5 +1,71 @@
+真机运行：Running on the Jetson Nano:
+# 克隆仓库
+```shell
+# 创建本地工作目录 Create local workspace
+mkdir -p ~/agx_workspace
+cd ~/agx_workspace
+# 克隆项目 Clone the project
+git clone https://github.com/agilexrobotics/limo_ros2.git src
+# 中国大陆用户加速下载(Provide accelerated downloads for users in Chinese Mainland) 
+# git clone https://ghproxy.com/https://github.com/agilexrobotics/limo_ros2.git src
 
+mv ~/agx_workspace/src/.devcontainer ~/agx_workspace
+```
+# 【推荐】使用 VS Code remote 插件 连接到 limo，打开 ~/agx_workspace 后在菜单中选择 reopen in container
+# [Recommend] Login the limo via VS Code remote plugin, open ~/agx_workspace.Then select reopen in container in the menu
+
+
+
+# 或运行自动配置脚本 Or running automatically setup script
+```shell
+cd ~/agx_workspace/src
+chmod +x setup.sh
+./docker_setup.sh
+```
+然后按照提示进行操作 Then follow the prompts
+
+# 仿真： Simulation:
 下面的脚本一条一条运行， 注意不能在后台运行  After installing ROS2 Eloquent [see documents here](docs/README.md) and setting up the software and environment run the following scripts one by one, being careful not to run in the background
+
+# 前期准备 Preparing
+```shell
+# 创建本地工作目录 Create local workspace
+mkdir -p ~/agx_workspace
+cd ~/agx_workspace
+# 克隆项目 Clone the project
+git clone https://github.com/agilexrobotics/limo_ros2.git src
+# 中国大陆用户加速下载(Provide accelerated downloads for users in Chinese Mainland) 
+# git clone https://ghproxy.com/https://github.com/agilexrobotics/limo_ros2.git src
+
+# 安装必要支持库 Install essential packages
+apt-get update \
+    && apt-get install -y --no-install-recommends \	
+    libusb-1.0-0 \
+    udev \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    swig \
+    software-properties-common \
+    python3-pip
+
+
+# 安装雷达驱动 Install ydlidar driver
+git clone https://ghproxy.com/https://github.com/YDLIDAR/YDLidar-SDK.git &&\
+    mkdir -p YDLidar-SDK/build && \
+    cd YDLidar-SDK/build &&\
+    cmake ..&&\
+    make &&\
+    make install &&\
+    cd .. &&\
+    pip install . &&\
+    cd .. && rm -r YDLidar-SDK 
+
+# 编译功能包 Compile limo_ros2 packages
+cd ~/agx_workspace
+catkin_make
+source devel/setup.bash
+```
 
 # 导航 Navigation
 

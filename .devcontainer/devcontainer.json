@@ -1,0 +1,48 @@
+// 改编自 https://github.com/athackst/vscode_ros2_workspace
+// See https://aka.ms/vscode-remote/devcontainer.json for format details.
+{
+    "dockerFile": "Dockerfile",
+    "build": {
+        "args": {
+            "WORKSPACE": "${containerWorkspaceFolder}"
+        }
+    },
+    "runArgs": [
+        "--network=host",
+        "-v=/dev:/dev",
+        "--privileged",
+        "--device-cgroup-rule" "a *:* rmw",
+        "--cap-add=SYS_PTRACE",
+        "--security-opt=seccomp:unconfined",
+        "--security-opt=apparmor:unconfined",
+        "--volume=/tmp/.X11-unix:/tmp/.X11-unix",
+        "--gpus=all"
+    ],
+    "containerEnv": {
+        "DISPLAY": "${localEnv:DISPLAY}",
+        "LIBGL_ALWAYS_SOFTWARE": "1" // Needed for software rendering of opengl
+    },
+    // Set *default* container specific settings.json values on container create.
+    "settings": {
+        "terminal.integrated.profiles.linux": {
+            "bash": {
+                "path": "bash"
+            },
+        },
+        "terminal.integrated.defaultProfile.linux": "bash"
+    },
+    // 推荐安装的插件
+    "extensions": [
+        "dotjoshjohnson.xml",
+        "zachflower.uncrustify",
+        "ms-azuretools.vscode-docker",
+        "ms-iot.vscode-ros",
+        "ms-python.python",
+        "ms-vscode.cpptools",
+        "redhat.vscode-yaml",
+        "smilerobotics.urdf",
+        "streetsidesoftware.code-spell-checker",
+        "twxs.cmake",
+        "yzhang.markdown-all-in-one"
+    ]
+}
