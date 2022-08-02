@@ -50,16 +50,23 @@ function start_image()
     then
         image_tag=$1
     fi
+
+    # give docker root user X11 permissions
+    sudo xhost +si:localuser:root
+
+    # enable SSH X11 forwarding inside container (https://stackoverflow.com/q/48235040)
+    XAUTH=/tmp/.docker.xauth
+    xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+    chmod 777 $XAUTH
     
     docker run --network=host \
         -d
         -v=/dev:/dev \
         --privileged \
         --device-cgroup-rule="a *:* rmw" \
-        --cap-add=SYS_PTRACE \
-        --security-opt=seccomp:unconfined \
-        --security-opt=apparmor:unconfined \
         --volume=/tmp/.X11-unix:/tmp/.X11-unix \
+        -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH \
+        --runtime nvidia
         --gpus=all \
         -v=${PWD}/..:/workspace \
         -w=/workspace \
