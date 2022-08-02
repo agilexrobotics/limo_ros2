@@ -31,7 +31,7 @@ find_package(ament_cmake REQUIRED)
 # endif()
 
 install(
-    DIRECTORY  param maps
+    DIRECTORY  param maps config_files launch
     launch DESTINATION share/${PROJECT_NAME}/
 )
 
