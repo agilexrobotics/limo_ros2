@@ -169,6 +169,7 @@ void LimoDriver::processRxData(uint8_t data) {
 
         case LIMO_WAIT_HEADER:
          {
+
             if (data == FRAME_HEADER) {
                 // std::cout << "- frame.stamp:1 " << frame.stamp << std::endl;
                 // frame.stamp = ros::Time::now().toSec();    waring 时间戳转化为浮点格式
@@ -473,7 +474,7 @@ void LimoDriver::publishIMUData(double stamp) {
 
     geometry_msgs::msg::TransformStamped t;  
     
-    imu_msg.header.stamp = rclcpp::Time(stamp);
+    imu_msg.header.stamp = rclcpp::Time(RCL_S_TO_NS(stamp));
     imu_msg.header.frame_id = "imu_link";
 
     imu_msg.linear_acceleration.x = imu_data_.accel_x;
