@@ -406,7 +406,7 @@ void LimoDriver::setMotionCommand(double linear_vel, double angular_vel,
     frame.data[6] = static_cast<uint8_t>(steering_cmd >> 8);
     frame.data[7] = static_cast<uint8_t>(steering_cmd & 0x00ff);
     sendFrame(frame);
-    RCLCPP_INFO(this->get_logger(),"setMotionCommand :");
+    //RCLCPP_INFO(this->get_logger(),"setMotionCommand :");
 }
 
 void LimoDriver::sendFrame(const LimoFrame& frame) {
