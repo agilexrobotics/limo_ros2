@@ -31,16 +31,16 @@ class Plugin(object):
             
         if event_type == "load":
             self._cmd_vel_puber = self._api_interface.create_publisher(Twist,"cmd_vel", 10)
-            self._timer=self._api_interface.create_timer(0.3, self._pub_cmd_vel)
+            self._timer=self._api_interface.create_timer(0.4, self._pub_cmd_vel)
             self._api_interface.LogTool.info("Plugin_test2 loaded successful!")
         elif event_type == "command":
             self._stop()
             if event_value == "FORWARD":    
-                self._cmd_vel_msg.linear.x=0.3
+                self._cmd_vel_msg.linear.x=0.1
                 self._api_interface.LogToll.info("forward")
 
             elif event_value == "BACK":
-                self._cmd_vel_msg.linear.x=-0.3
+                self._cmd_vel_msg.linear.x=-0.1
                 self._api_interface.LogToll.info("back")
 
             elif event_value == "LEFT":

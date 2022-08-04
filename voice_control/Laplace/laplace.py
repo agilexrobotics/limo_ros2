@@ -1,15 +1,17 @@
 from .PluginSystem.server import PluginServer
+from .APIInterface import APIInterface
 from pyaudio import PyAudio
 import speech_recognition
 from speech_recognition import UnknownValueError
 import os
+import pyttsx3
 
 class Laplace(object):
     def __init__(self, recognition_engine="google", hot_word=None,language='en-US', Authentic_key=None,mic_index=None, speaker_index=None, Plugin_path="./Plugins",api_interface=None):
-        self._api_interface=api_interface
+        self._api_interface=api_interface if api_interface is not None else APIInterface()
         self._api_interface.LogTool.info("Now in file %s"%os.getcwd())
         self._api_interface.LogTool.info("Initializing plugin system")
-        self._ps = PluginServer(Plugin_path=Plugin_path, api_interface=api_interface)
+        self._ps = PluginServer(Plugin_path=Plugin_path, api_interface=self._api_interface)
         self._audio = PyAudio()
         self._Authentic_key = Authentic_key
         self._mic_index = mic_index if mic_index is not None else self._audio.get_default_input_device_info()['index']
@@ -70,14 +72,14 @@ class Laplace(object):
             self.spin_once()
     
     def spin_once(self):
-        speechs = ""
+        _command = ""
         if self._waiting_for_hot_word:
-            speechs = self._get_recognize()
-            if self._hot_word == speechs:
+            _command = self._get_recognize()
+            if self._hot_word == _command:
                 self._waiting_for_hot_word = False
         else:
-            #pyttsx3.speak("Say command to me")
-            speechs = self._get_recognize()
-            self._ps.append_event("command",speechs)
+            pyttsx3.speak("Say command to me")
+            _command = self._get_recognize()
+            self._ps.append_event("command",_command)
             self._waiting_for_hot_word = True if self._hot_word is not None else False
-        self._api_interface.LogTool.debug(f"recognized [{speechs}]")
+        self._api_interface.LogTool.debug(f"recognized [{_command}]")

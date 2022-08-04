@@ -1,8 +1,6 @@
 import os
 import sys
 import importlib
-from .APIInterface import APIInterface
-
 
 class PluginManager(object):
     """
@@ -15,14 +13,8 @@ class PluginManager(object):
 
     def __init__(self,api_interface=None) -> None:
         super().__init__()
-        self.api = self.create_api_interface() if api_interface is None else api_interface
+        self.api = api_interface
         self.__plugins = {}
-
-    @classmethod
-    def create_api_interface(cls, *args, **kwargs) -> APIInterface:
-        """Create ApiInterface
-        """
-        return APIInterface(*args, **kwargs)
 
     def _find_plugins(self, plugin_path: str):
         """
