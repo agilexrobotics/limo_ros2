@@ -8,7 +8,7 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, SetE
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 
-from nav2_common.launch import Node
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
@@ -77,8 +77,8 @@ def generate_launch_description():
                           
     start_lifecycle_manager_cmd = Node(
         package='nav2_lifecycle_manager',
-        node_executable='lifecycle_manager',
-        node_name='lifecycle_manager',
+        executable='lifecycle_manager',
+        name='lifecycle_manager',
         output='screen',
         parameters=[{'use_sim_time': use_sim_time},
                     {'autostart': autostart},

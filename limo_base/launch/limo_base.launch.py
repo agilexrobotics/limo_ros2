@@ -21,6 +21,8 @@ def generate_launch_description():
                                                 description='Base link frame id')
     odom_topic_arg = DeclareLaunchArgument('odom_topic_name', default_value='odom',
                                            description='Odometry topic name')
+    odom_tf_arg = DeclareLaunchArgument('pub_odom_tf', default_value='True',
+                                           description='Odometry topic name')
 
     # is_scout_mini_arg = DeclareLaunchArgument('is_scout_mini', default_value='false',
     #                                       description='Scout mini model')
@@ -46,6 +48,7 @@ def generate_launch_description():
                 # 'is_scout_mini': launch.substitutions.LaunchConfiguration('is_scout_mini'),
                 # 'is_omni_wheel': launch.substitutions.LaunchConfiguration('is_omni_wheel'),
                 # 'simulated_robot': launch.substitutions.LaunchConfiguration('simulated_robot'),
+                'pub_odom_tf': launch.substitutions.LaunchConfiguration('pub_odom_tf'),
                 'control_rate': launch.substitutions.LaunchConfiguration('control_rate'),
         }])
 
@@ -55,6 +58,7 @@ def generate_launch_description():
         odom_frame_arg,
         base_link_frame_arg,
         odom_topic_arg,
+        odom_tf_arg,
         # is_scout_mini_arg,
         # is_omni_wheel_arg,
         # simulated_robot_arg,
