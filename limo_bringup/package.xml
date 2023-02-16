@@ -21,16 +21,6 @@
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
 
-  <exec_depend>nav2_amcl</exec_depend>
-  <exec_depend>nav2_lifecycle_manager</exec_depend>
-  <exec_depend>nav2_map_server</exec_depend>
-  <exec_depend>nav2_controller</exec_depend>
-  <exec_depend>nav2_planner</exec_depend>
-  <exec_depend>nav2_recoveries</exec_depend>
-  <exec_depend>nav2_bt_navigator</exec_depend>
-  <exec_depend>nav2_waypoint_follower</exec_depend>
-  <exec_depend>cartographer_ros</exec_depend>
-  <exec_depend>cartographer</exec_depend>
   <exec_depend>teleop_twist_keyboard</exec_depend>
 
 

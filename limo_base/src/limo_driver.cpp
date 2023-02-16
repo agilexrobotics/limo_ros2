@@ -578,8 +578,7 @@ void LimoDriver::publishOdometry(double stamp, double linear_velocity,
     // double limo_yaw=tf2::Quaternion::setRPY();
     // double limo_yaw;
     tf2::Quaternion limo_yaw;
-    limo_yaw.setRPY(0,0,real_theta_);
-
+    limo_yaw.setRPY(0,0,rad);
     geometry_msgs::msg::Quaternion odom_quat = tf2::toMsg(limo_yaw);
   
     //std::cout<< "odom_quat:" << odom_quat<<std::endl;
