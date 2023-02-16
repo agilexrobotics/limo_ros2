@@ -11,24 +11,17 @@ git clone https://github.com/agilexrobotics/limo_ros2.git src
 
 mv ~/agx_workspace/src/.devcontainer ~/agx_workspace
 ```
-``【推荐】使用 VS Code remote 插件 连接到 limo，打开 ~/agx_workspace 后在菜单中选择 reopen in container``
- ``[Recommend] Login the limo via VS Code remote plugin, open ~/agx_workspace.Then select reopen in container in the menu``
+如果您需要 CUDA 环境，请移步 https://github.com/dusty-nv/jetson-containers 根据指导构建环境
 
+# 配置环境
 
+您有三种方式在ubuntu系统上配置能够支持limo_ros2代码运行的环境
 
-``或运行自动配置脚本 Or running automatically setup script``
-```shell
-cd ~/agx_workspace/src
-chmod +x setup.sh
-./docker_setup.sh
-```
-然后按照提示进行操作 Then follow the prompts
+### 本地部署
 
-# 仿真： Simulation:
-下面的脚本一条一条运行， 注意不能在后台运行  After installing ROS2 Eloquent [see documents here](docs/README.md) and setting up the software and environment run the following scripts one by one, being careful not to run in the background
+如果您希望在本地部署下载所有有关依赖，您可以尝试使用rosdep工具自动安装依赖，或者使用apt包管理工具依次安装所有的ros依赖文件
 
-# 前期准备 Preparing
-```shell
+```bash
 # 创建本地工作目录 Create local workspace
 mkdir -p ~/agx_workspace
 cd ~/agx_workspace
@@ -67,6 +60,64 @@ catkin_make
 source devel/setup.bash
 ```
 
+
+
+### dockerfile构建docker环境
+
+如果您对docker的使用有一定的了解，代码仓库中已经包含了dockerfile，您可以运行docker build命令直接构建，当然我们更推荐使用我们编写的自动化脚本来完成整个过程：
+
+``【推荐】使用 VS Code remote 插件 连接到 limo，打开 ~/agx_workspace 后在菜单中选择 reopen in container``
+ ``[Recommend] Login the limo via VS Code remote plugin, open ~/agx_workspace.Then select reopen in container in the menu``
+
+``运行自动配置脚本 Or running automatically setup script``
+
+```shell
+cd ~/agx_workspace/src
+chmod +x setup.sh
+./docker_setup.sh
+```
+然后按照提示进行操作 Then follow the prompts
+
+### 直接拉取docker镜像
+
+我们还将所需的镜像打包上传到了dockerhub网站，您可以直接运行下面的命令：
+
+```bash
+docker pull lagrangeluo/limo_ros2:v1
+```
+
+当镜像拉取完毕后，查看镜像，如果列表中出现了镜像名称，则说明pull成功了
+
+```bash
+agilex@agilex-desktop:~$ docker image list
+REPOSITORY                                                         TAG        IMAGE ID       CREATED          SIZE
+lagrangeluo/limo_ros2                                              v1         224540b5b168   11 minutes ago   7.57GB
+```
+
+通过容器启动镜像：
+
+```bash
+docker run --network=host \
+      -d
+      -v=/dev:/dev \
+      --privileged \
+      --device-cgroup-rule="a *:* rmw" \
+      --volume=/tmp/.X11-unix:/tmp/.X11-unix \
+      -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH \
+      --runtime nvidia
+      --gpus=all \
+      -w=/workspace \
+      --name limo_dev \
+      -e LIBGL_ALWAYS_SOFTWARE="1" \
+      -e DISPLAY=${DISPLAY} \
+      --restart=always \
+      -v ~/agx_workspace:/home/limo_ros1_ws \
+      lagrangeluo/limo_ros2:v1 \
+
+```
+
+当使用任意一种方式成功创建容器之后，便可以在容器环境下运行代码了。
+
 # 导航 Navigation
 
 ```shell
@@ -76,11 +127,7 @@ ros2 launch limo_bringup limo_start.launch.py
 sleep 2
 
 ## 启动导航 start navigation
-ros2 launch limo_bringup limo_navigation.launch.py
-sleep 2
-
-## 启动定位 start positioning
-ros2 launch limo_bringup limo_localization.launch.py
+ros2 launch limo_bringup navigation2.launch.py
 ```
 
 # 建图 start positioning
