@@ -76,11 +76,8 @@ ros2 launch limo_bringup limo_start.launch.py
 sleep 2
 
 ## 启动导航 start navigation
-ros2 launch limo_bringup limo_navigation.launch.py
-sleep 2
+ros2 launch limo_bringup navigation2.launch.py
 
-## 启动定位 start positioning
-ros2 launch limo_bringup limo_localization.launch.py
 ```
 
 # 建图 start positioning
