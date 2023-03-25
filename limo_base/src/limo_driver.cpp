@@ -36,12 +36,12 @@ namespace AgileX {
 LimoDriver::LimoDriver(std::string node_name):rclcpp::Node(node_name),keep_running_(false){
 
     std::string port_name="ttyTHS1";    
-    this->declare_parameter("port_name");   //声明参数
-    this->declare_parameter("odom_frame");
-    this->declare_parameter("base_frame");
-    this->declare_parameter("pub_odom_tf");
-    this->declare_parameter("use_mcnamu");
-    this->declare_parameter("control_rate");  
+    this->declare_parameter("port_name", "");   //声明参数
+    this->declare_parameter("odom_frame", "");
+    this->declare_parameter("base_frame", "");
+    this->declare_parameter("pub_odom_tf", "");
+    this->declare_parameter("use_mcnamu", "");
+    this->declare_parameter("control_rate", "");  
 
     this->get_parameter_or<std::string>("port_name", port_name, "ttyTHS1");//获取参数
     this->get_parameter_or<std::string>("odom_frame", odom_frame_, "odom");
