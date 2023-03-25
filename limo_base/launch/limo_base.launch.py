@@ -36,7 +36,7 @@ def generate_launch_description():
     
     limo_base_node = launch_ros.actions.Node(
         package='limo_base',
-        node_executable='limo_base',  #foxy executable='limo_base',
+        executable='limo_base',  #foxy executable='limo_base',
         output='screen',
         emulate_tty=True,
         parameters=[{
@@ -45,12 +45,11 @@ def generate_launch_description():
                 'odom_frame': launch.substitutions.LaunchConfiguration('odom_frame'),
                 'base_frame': launch.substitutions.LaunchConfiguration('base_frame'),
                 'odom_topic_name': launch.substitutions.LaunchConfiguration('odom_topic_name'),
-                # 'is_scout_mini': launch.substitutions.LaunchConfiguration('is_scout_mini'),
-                # 'is_omni_wheel': launch.substitutions.LaunchConfiguration('is_omni_wheel'),
-                # 'simulated_robot': launch.substitutions.LaunchConfiguration('simulated_robot'),
                 'pub_odom_tf': launch.substitutions.LaunchConfiguration('pub_odom_tf'),
                 'control_rate': launch.substitutions.LaunchConfiguration('control_rate'),
-        }])
+        }],
+        namespace='limo'
+    )
 
     return LaunchDescription([
         # use_sim_time_arg,

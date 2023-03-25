@@ -127,10 +127,6 @@ def generate_launch_description():
     executable='joint_state_publisher_gui',
     name='joint_state_publisher_gui',
     parameters=[{'use_sim_time': use_sim_time}])
-  # start_dummy_sensors=Node(
-  #   package='dummy_sensors', 
-  #   node_executable='dummy_joint_states', 
-  #   output='screen')
 
   # Launch RViz
   start_rviz_cmd = Node(
