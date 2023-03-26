@@ -12,7 +12,7 @@ from ament_index_python.packages import get_package_share_directory
 def generate_launch_description():
 
     port_name = DeclareLaunchArgument(name='port_name',
-                                             default_value='/dev/ydlidar')
+                                             default_value='ttyTHS1')
     odom_topic_name = DeclareLaunchArgument(name='odom_topic_name',
                                              default_value='odom')
     open_rviz = DeclareLaunchArgument(name='open_rviz',
