@@ -1,0 +1,55 @@
+#!/bin/bash
+
+IP="$1"
+DOMAIN_ID="$2"
+if [ -z "$1" ]
+    then
+        echo "No argument given, If an IP is required, please provide it as an argument. Using [localhost] for this run."
+        IP="localhost"
+fi
+
+if [ -z "$2" ]
+    then
+        echo "No argument given, Assume that ROS_DOMAIN_ID is 1"
+        DOMAIN_ID=1
+fi
+
+xhost +local:root 
+
+XAUTH=/tmp/.docker.xauth
+
+if [ ! -f $XAUTH ]
+then
+    xauth_list=$(xauth nlist :0 | sed -e 's/^..../ffff/')
+    if [ ! -z "$xauth_list" ]
+    then
+        echo $xauth_list | xauth -f $XAUTH nmerge -
+    else
+        touch $XAUTH
+    fi
+    chmod a+r $XAUTH
+fi
+
+docker run -it \
+  --rm \
+  --privileged \
+  --net=host \
+  --name=humble \
+  --runtime=nvidia \
+  --env="DISPLAY=$DISPLAY" \
+  --env="QT_X11_NO_MITSHM=1" \
+  --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+  --env="XAUTHORITY=$XAUTH" \
+  --env="ROS_HOSTNAME=$IP" \
+  --env="ROS_DOMAIN_ID=$DOMAIN_ID" \
+  --env="GAZEBO_MASTER_URI=http://$IP:11345" \
+  --volume="$XAUTH:$XAUTH" \
+  --volume="${PWD}/":"/external:rw" \
+  --volume="/home/$USER/.ros_here_persist/humble_ws":"/global_ws:rw" \
+  --volume="/etc/udev/rules.d":"/etc/udev/rules.d:rw" \
+  --device=/dev/ydlidar \
+  --device=/dev/astra_dabai \
+  general_humble bash
+
+# NOTE: Remember to: Sync clocks/timezones with host and pi
+# NOTE: Remember to: set master and host on both host and pi
