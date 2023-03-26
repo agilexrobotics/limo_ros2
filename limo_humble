@@ -31,8 +31,6 @@ then
 fi
 
 docker run \
-  --device=/dev/ydlidar \
-  --device=/dev/astra_dabai \
   -it \
   --rm \
   --privileged \
