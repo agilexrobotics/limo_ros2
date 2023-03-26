@@ -30,7 +30,10 @@ then
     chmod a+r $XAUTH
 fi
 
-docker run -it \
+docker run \
+  --device=/dev/ydlidar \
+  --device=/dev/astra_dabai \
+  -it \
   --rm \
   --privileged \
   --net=host \
@@ -47,8 +50,6 @@ docker run -it \
   --volume="${PWD}/":"/external:rw" \
   --volume="/home/$USER/.ros_here_persist/humble_ws":"/global_ws:rw" \
   --volume="/etc/udev/rules.d":"/etc/udev/rules.d:rw" \
-  --device=/dev/ydlidar \
-  --device=/dev/astra_dabai \
   general_humble bash
 
 # NOTE: Remember to: Sync clocks/timezones with host and pi
