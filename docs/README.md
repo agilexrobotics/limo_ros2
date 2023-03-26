@@ -1,3 +1,72 @@
+# This pacakge can be run in humble env.
+# Follow the below steps
+## Preparation
+
+0. create ros2_ws (If you have already created a ros2 workspace then use it)
+```
+mkdir -p ros2_ws/src
+```
+
+1. install catmux and tmux in your host machine
+```
+sudo apt update && sudo apt intall -y tmux && \
+python3 -m install catmux
+```
+
+2. install the docker image from here
+```
+cd ~ &&
+git clone https://github.com/Wataru-Osihima-Tokyo/ros_here
+```
+
+3. run the scripts
+```
+cd ~/ros_here/humble/armv8 && \
+./build_docker.sh && \
+./ez_bin_install
+```
+4. since the script creates a directory called .ros_here_persist/humble_ws in the home directory, move/clone this repo to src under the directory
+5. clone ydlidar sdk
+```
+cd ~/.ros_persist_here/humble_ws/
+git clone https://github.com/YDLIDAR/YDLidar-SDK.git
+```
+6. Now you are ready to compile all of them
+```
+cd ~/ros2_ws &&
+humble_here &
+login_humble
+# Now you are in humble env
+```
+7. move to global_ws and compile ydlidarSDK
+```
+cd /global_ws && \
+cd YDLIDAR/YDLidar-SDK && \
+mkdir build && \
+cd build && \
+cmake .. && \
+make && \
+sudo make install
+```
+
+8. Finally compile this package
+```
+cd /global_ws &&
+colcon build --symlink-install
+```
+
+## Test run
+move to limo_ros2 repo and run catmux in your host
+```
+cd ~/.ros_persist_here/humble_ws/src/limo_ros2/catmux && \
+catmux_create_session limo_start.yaml
+```
+
+Now you can run LIMO by teleop_keyboard
+
+
+
+
 # Limo ROS2 Manual (Translated English)
 
 ## Log into Limo

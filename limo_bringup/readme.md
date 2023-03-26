@@ -1,31 +1,32 @@
 
-下面的脚本一条一条运行， 注意不能在后台运行
+Run the following scripts one by one, and do not run them in the background:
  
-# 导航
+# Navigation
 
 ```shell
 rviz2
-## 启动底盘
+## Start the chassis
 ros2 launch limo_bringup limo_start.launch.py
 sleep 2
-## 启动导航
+## Start navigation
 ros2 launch limo_bringup limo_navigation.launch.py
 sleep 2
-## 启动定位
+## Start localization
 ros2 launch limo_bringup limo_localization.launch.py
 ```
 
-# 建图
+# Mapping
 
 ```shell
 ros2 launch limo_bringup limo_start.launch.py
 ros2 launch build_map_2d revo_build_map_2d.launch.py
-#上面三条指令启动之后，用遥控器控制车子行走
-# 建完图保存， 放到 limo_bringup/maps 里， 再 colcon build 编译一下XXX
+# After executing the above three commands, control the car with the remote control to move around and build the map
+# Save the built map in limo_bringup/maps directory and compile it with colcon build XXX
+
 ```
 
 
-# 键盘控制
+#　Keyboard Control
 
 ```shell
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
