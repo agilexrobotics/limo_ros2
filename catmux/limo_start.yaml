@@ -10,6 +10,7 @@ windows:
     commands:
       - cd ../..
       - login_humble
+      - source /global_ws/install/setup.bash
       - ros2 launch limo_bringup limo_start.launch.py
   - name: topic_check
     commands:
