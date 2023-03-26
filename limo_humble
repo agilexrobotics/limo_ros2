@@ -51,6 +51,8 @@ docker run \
   --volume="/home/$USER/.ros_here_persist/humble_ws":"/global_ws:rw" \
   --volume="/etc/udev/rules.d":"/etc/udev/rules.d:rw" \
   -v /dev/ydlidar:/dev/ydlidar \
+  -v /dev/astra_dabai:/dev/astra_dabai \
+  -v /dev/astrauvc:/dev/astrauvc \
   general_humble bash
 
 # NOTE: Remember to: Sync clocks/timezones with host and pi

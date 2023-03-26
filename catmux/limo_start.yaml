@@ -4,15 +4,12 @@ common:
 windows:
   - name: creata_env 
     commands:
-      - cd ../..
-      - humble_here
+      - cd ../
+      - ./limo_humble
   - name: limo_start
     commands:
       - cd ../..
       - login_humble
-      - echo 'KERNEL=="ttyUSB*",KERNELS=="1-2.2", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", MODE:="0666", GROUP:="dialout",  SYMLINK+="ydlidar"' > /etc/udev/rules.d/ydlidar.rules 
-      - echo 'KERNEL=="video*", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="050e", ATTR{index}=="0", MODE:="0666", GROUP:="video", SYMLINK+="astra_dabai"' > video.rules
-      - udevadm control --reload-rules
       - ros2 launch limo_bringup limo_start.launch.py
   - name: topic_check
     commands:
