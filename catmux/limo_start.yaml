@@ -1,6 +1,6 @@
 ---
 common:
-  default_window: rcs_server
+  default_window: topic_check
 windows:
   - name: creata_env 
     commands:
@@ -14,3 +14,7 @@ windows:
       - echo 'KERNEL=="video*", ATTRS{idVendor}=="2bc5", ATTRS{idProduct}=="050e", ATTR{index}=="0", MODE:="0666", GROUP:="video", SYMLINK+="astra_dabai"' > video.rules
       - udevadm control --reload-rules
       - ros2 launch limo_bringup limo_start.launch.py
+  - name: topic_check
+    commands:
+      - cd ../..
+      - login_humble
