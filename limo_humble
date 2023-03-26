@@ -50,7 +50,7 @@ docker run \
   --volume="${PWD}/":"/external:rw" \
   --volume="/home/$USER/.ros_here_persist/humble_ws":"/global_ws:rw" \
   --volume="/etc/udev/rules.d":"/etc/udev/rules.d:rw" \
-  -v /dev/ydlidar:/dev/ydlidar
+  -v /dev/ydlidar:/dev/ydlidar \
   general_humble bash
 
 # NOTE: Remember to: Sync clocks/timezones with host and pi
