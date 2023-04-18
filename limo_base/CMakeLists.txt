@@ -23,6 +23,7 @@ find_package(nav_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 find_package(limo_msgs REQUIRED)
 
 include_directories(
@@ -38,13 +39,14 @@ set(DEPENDENCIES
   "tf2_ros"
   "limo_msgs"
   "sensor_msgs"
+  "tf2_geometry_msgs"
 )
 
 add_executable(limo_base 
     src/limo_base_node.cpp
     src/limo_driver.cpp
     src/serial_port.cpp)
-ament_target_dependencies(limo_base rclcpp std_msgs tf2 tf2_ros nav_msgs sensor_msgs limo_msgs)
+ament_target_dependencies(limo_base rclcpp std_msgs tf2 tf2_ros nav_msgs sensor_msgs limo_msgs tf2_geometry_msgs)
 
 install(
   DIRECTORY include/

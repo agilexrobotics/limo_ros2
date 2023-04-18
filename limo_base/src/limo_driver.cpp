@@ -34,20 +34,14 @@ int flag=0;
 namespace AgileX {
 
 LimoDriver::LimoDriver(std::string node_name):rclcpp::Node(node_name),keep_running_(false){
-
-    std::string port_name="ttyTHS1";    
-    this->declare_parameter("port_name");   //声明参数
-    this->declare_parameter("odom_frame");
-    this->declare_parameter("base_frame");
-    this->declare_parameter("pub_odom_tf");
-    this->declare_parameter("use_mcnamu");
-    this->declare_parameter("control_rate");  
-
-    this->get_parameter_or<std::string>("port_name", port_name, "ttyTHS1");//获取参数
-    this->get_parameter_or<std::string>("odom_frame", odom_frame_, "odom");
-    this->get_parameter_or<std::string>("base_frame", base_frame_, "base_link");
-    this->get_parameter_or<bool>("pub_odom_tf", pub_odom_tf_, "false");
-    this->get_parameter_or<bool>("use_mcnamu", use_mcnamu_, "false");
+ 
+    std::string port_name = "ttyTHS1";
+    port_name = this->declare_parameter<std::string>("port_name", port_name);
+    odom_frame_ = this->declare_parameter<std::string>("odom_frame", "odom");
+    base_frame_ = this->declare_parameter<std::string>("base_frame", "base_link");
+    pub_odom_tf_ = this->declare_parameter<bool>("pub_odom_tf", false);
+    use_mcnamu_ = this->declare_parameter<bool>("use_mcnamu", false);
+    int control_rate = this->declare_parameter<int>("control_rate", 50);
 
     std::cout << "Loading parameters: " << std::endl;
     std::cout << "- port name: " << port_name << std::endl;

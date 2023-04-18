@@ -20,7 +20,7 @@
   <depend>limo_msgs</depend>
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
-
+  <exec_depend>ros2launch</exec_depend>
   <exec_depend>teleop_twist_keyboard</exec_depend>
 
 

@@ -1,0 +1,19 @@
+---
+common:
+  default_window: control_limo
+windows:
+  - name: creata_env 
+    commands:
+      - cd ../
+      - ./limo_humble
+  - name: limo_start
+    commands:
+      - cd ../..
+      - login_humble
+      - source /global_ws/install/setup.bash
+      - ros2 launch limo_bringup limo_start.launch.py
+  - name: control_limo
+    commands:
+      - cd ../..
+      - login_humble
+      - ros2 teleop_twist_keyboard teleop_twist_keyboard

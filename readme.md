@@ -1,179 +1,190 @@
-# 真机运行：Running on the Jetson Nano:
-# 克隆仓库
-```shell
-# 创建本地工作目录 Create local workspace
-mkdir -p ~/agx_workspace
-cd ~/agx_workspace
-# 克隆项目 Clone the project
-git clone https://github.com/agilexrobotics/limo_ros2.git src
-# 中国大陆用户加速下载(Provide accelerated downloads for users in Chinese Mainland) 
-# git clone https://ghproxy.com/https://github.com/agilexrobotics/limo_ros2.git src
+# This pacakge can be run in humble env.
+# Follow the below steps
+## Preparation
 
-mv ~/agx_workspace/src/.devcontainer ~/agx_workspace
+0. create ros2_ws (If you have already created a ros2 workspace then use it)
 ```
-如果您需要 CUDA 环境，请移步 https://github.com/dusty-nv/jetson-containers 根据指导构建环境
-
-# 配置环境
-
-您有三种方式在ubuntu系统上配置能够支持limo_ros2代码运行的环境
-
-### 本地部署
-
-如果您希望在本地部署下载所有有关依赖，您可以尝试使用rosdep工具自动安装依赖，或者使用apt包管理工具依次安装所有的ros依赖文件
-
-```bash
-# 创建本地工作目录 Create local workspace
-mkdir -p ~/agx_workspace
-cd ~/agx_workspace
-# 克隆项目 Clone the project
-git clone https://github.com/agilexrobotics/limo_ros2.git src
-# 中国大陆用户加速下载(Provide accelerated downloads for users in Chinese Mainland) 
-# git clone https://ghproxy.com/https://github.com/agilexrobotics/limo_ros2.git src
-
-# 安装必要支持库 Install essential packages
-apt-get update \
-    && apt-get install -y --no-install-recommends \	
-    libusb-1.0-0 \
-    udev \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    swig \
-    software-properties-common \
-    python3-pip
-
-
-# 安装雷达驱动 Install ydlidar driver
-git clone https://ghproxy.com/https://github.com/YDLIDAR/YDLidar-SDK.git &&\
-    mkdir -p YDLidar-SDK/build && \
-    cd YDLidar-SDK/build &&\
-    cmake ..&&\
-    make &&\
-    make install &&\
-    cd .. &&\
-    pip install . &&\
-    cd .. && rm -r YDLidar-SDK 
-
-# 编译功能包 Compile limo_ros2 packages
-cd ~/agx_workspace
-catkin_make
-source devel/setup.bash
+mkdir -p ros2_ws/src
 ```
 
-
-
-### dockerfile构建docker环境
-
-如果您对docker的使用有一定的了解，代码仓库中已经包含了dockerfile，您可以运行docker build命令直接构建，当然我们更推荐使用我们编写的自动化脚本来完成整个过程：
-
-``【推荐】使用 VS Code remote 插件 连接到 limo，打开 ~/agx_workspace 后在菜单中选择 reopen in container``
- ``[Recommend] Login the limo via VS Code remote plugin, open ~/agx_workspace.Then select reopen in container in the menu``
-
-``运行自动配置脚本 Or running automatically setup script``
-
-```shell
-cd ~/agx_workspace/src
-chmod +x setup.sh
-./docker_setup.sh
+1. install catmux and tmux in your host machine
 ```
-然后按照提示进行操作 Then follow the prompts
-
-### 直接拉取docker镜像
-
-我们还将所需的镜像打包上传到了dockerhub网站，您可以直接运行下面的命令：
-
-```bash
-docker pull lagrangeluo/limo_ros2:v1
+sudo apt update && sudo apt intall -y tmux && \
+python3 -m install catmux
 ```
 
-当镜像拉取完毕后，查看镜像，如果列表中出现了镜像名称，则说明pull成功了
-
-```bash
-agilex@agilex-desktop:~$ docker image list
-REPOSITORY                                                         TAG        IMAGE ID       CREATED          SIZE
-lagrangeluo/limo_ros2                                              v1         224540b5b168   11 minutes ago   7.57GB
+2. install the docker image from here
+```
+cd ~ &&
+git clone https://github.com/Wataru-Osihima-Tokyo/ros_here
 ```
 
-通过容器启动镜像：
-
-```bash
-docker run --network=host \
-      -d
-      -v=/dev:/dev \
-      --privileged \
-      --device-cgroup-rule="a *:* rmw" \
-      --volume=/tmp/.X11-unix:/tmp/.X11-unix \
-      -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH \
-      --runtime nvidia
-      --gpus=all \
-      -w=/workspace \
-      --name limo_dev \
-      -e LIBGL_ALWAYS_SOFTWARE="1" \
-      -e DISPLAY=${DISPLAY} \
-      --restart=always \
-      -v ~/agx_workspace:/home/limo_ros1_ws \
-      lagrangeluo/limo_ros2:v1 \
-
+3. run the scripts
+```
+cd ~/ros_here/humble/armv8 && \
+./build_docker.sh && \
+./ez_bin_install
+```
+4. since the script creates a directory called .ros_here_persist/humble_ws in the home directory, move/clone this repo to src under the directory
+5. clone ydlidar sdk
+```
+cd ~/.ros_persist_here/humble_ws/
+git clone https://github.com/YDLIDAR/YDLidar-SDK.git
+```
+6. Now you are ready to compile all of them
+```
+cd ~/ros2_ws &&
+humble_here &
+login_humble
+# Now you are in humble env
+```
+7. move to global_ws and compile ydlidarSDK
+```
+cd /global_ws && \
+cd YDLIDAR/YDLidar-SDK && \
+mkdir build && \
+cd build && \
+cmake .. && \
+make && \
+sudo make install
 ```
 
-当使用任意一种方式成功创建容器之后，便可以在容器环境下运行代码了。
+8. Finally compile this package
+```
+cd /global_ws &&
+colcon build --symlink-install
+```
 
-# 导航 Navigation
+## Test run
+move to limo_ros2 repo and run catmux in your host
+```
+cd ~/.ros_persist_here/humble_ws/src/limo_ros2/catmux && \
+catmux_create_session limo_start.yaml
+```
 
-```shell
+Now you can run LIMO by teleop_keyboard
+
+
+
+
+# Limo ROS2 Manual (Translated English)
+
+## Log into Limo
+ssh to your Jetson Nano on the Limo
+
+Username `agilex`
+
+Password `agx`
+
+## Install nomachine
+
+`Install nomachine : https://www.nomachine.com/download/download&id=115&s=ARM`
+
+The wired connection address is configured as 192.168.1.3, gateway 192.168.1.1   
+
+## Create workspace
+*Note if you are doing this on the existing AgileX image with ros melodic, create a workspace called agilex_ros2_ws - in the Chinese version of the documentation they called their workspace agilex_ws which collides with the Limo melodic workspace*
+
+```
+mkdir ~/agilex_ros2_ws
+cd ~/agilex_ros2_ws
+mkdir src
+cd src
+git clone --recursive https://github.com/agilexrobotics/limo_ros2.git
+cd limo_ros2
+rm ydlidar_ros2/params/ydlidar.yaml
+ls -s limo_bringup/param/ydlidar.yaml ydlidar_ros2/params/ydlidar.yaml
+cd ~/agilex_ros2_ws
+```
+
+## Install YDlidarSDK
+```
+cd ~
+git clone https://github.com/YDLIDAR/YDLidar-SDK.git
+cd YDLIDAR/YDLidar-SDK
+mkdir build
+cd build
+cmake ..
+make
+sudo make install
+cd ~/agilex_ros2_ws
+```
+
+
+## Install ROS2 Eloquent
+
+First follow these instructions https://docs.ros.org/en/eloquent/Installation/Linux-Install-Debians.html to install ROS2 Eloquent
+
+Then add colcon and ros2 cartographer
+`sudo apt install python3-colcon-core`
+`sudo apt install ros-eloquent-cartographer`
+
+## Setup Agilex Workspace
+
+```
+cd ~/agilex_ros2_ws
+source /opt/ros/eloquent/setup.bash
+colcon build
+```
+
+## Setup ~/.bashrc for environment configuration
+
+Append the following to your boot
+
+```
+## ros2
+export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+source /opt/ros/eloquent/setup.bash
+source /home/agilex/agilex_ros2_ws/install/setup.bash
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${HOME}/agilex_ws/install/ugv_sdk/lib/ugv_sdk/:${HOME}/agilex_ros2_ws/install/async_port/lib/async_port:/opt/ros/eloquent/lib/:/usr/ local/lib/
+
+echo agx | sudo -S chmod 666 /dev/ttyTHS1
+```
+
+## Install RMW 
+
+`sudo apt install ros-eloquent-rmw-fastrtps*`
+
+
+
+## Install Nav2 :
+`sudo apt install ros2-eloquent-navigation2 ros-eloquent-nav2-amcl ros-eloquent-nav2*`
+
+To launch run `ros2 launch build_map_2d revo_build_map_2d.launch.py`
+
+## Save Map 
+
+`ros2 run nav2_map_server map_saver -f limo`
+
+Change yaml's free_thresh to 0.196
+
+Put the saved pictures limo.pgm, limo.yaml in the ~/agilex_ws/src/drivers/limo_ros2/limo_bringup/maps directory
+
+The image will not take effect until colcon build compiles
+
+## start navigation
+
+`ros2 launch limo_bringup limo_navigation.launch.py`
+
+## Start targeting
+
+`ros2 launch limo_bringup limo_localization.launch.py`
+
+## Steps to start while presenting
+
+Note that in order, localization is placed at the end. 
+
+During the test, it is found that the /map sent by nav2_map_server sometimes cannot keep last, so the start of map_server is placed at the end. 
+
+If there is no map, please try to start limo_localization.launch.py several times to load the map
+
+## rviz2
 rviz2
-## 启动底盘 start the chassis
+### start the chassis
 ros2 launch limo_bringup limo_start.launch.py
 sleep 2
-
-## 启动导航 start navigation
-ros2 launch limo_bringup navigation2.launch.py
-```
-
-# 建图 start positioning
-
-```shell
-rviz2
-ros2 launch limo_bringup limo_start.launch.py
-ros2 launch build_map_2d revo_build_map_2d.launch.py
-#上面三条指令启动之后，用遥控器控制车子行走 After the above three command are activated use a separate screen to control the car
-```
-
-
-# 键盘控制 keyboard control
-
-```shell
-ros2 launch limo_bringup limo_start.launch.py
-ros2 run teleop_twist_keyboard teleop_twist_keyboard
-```
-
-# 仿真 Simulation
-
-## 四轮差速模式  Four wheel differential mode
-
-rviz2中显示模型  Display the model in rviz2
-
-```
-ros2 launch limo_description display_models_diff.launch.py 
-```
-
-gazebo中显示模型 Run the simulation in gazebo
-
-```
-ros2 launch limo_description gazebo_models_diff.launch.py 
-```
-
-启动键盘控制节点控制limo Start keyboard teleop to control Limo
-
-```
-ros2 run teleop_twist_keyboard teleop_twist_keyboard
-```
-
-## 阿克曼模式  Ackermann Model
-
-开发中  In development
-
-
-
-
-
+### start navigation
+ros2 launch limo_bringup limo_navigation.launch.py
+sleep 2
+### start positioning
+ros2 launch limo_bringup limo_localization.launch.py
