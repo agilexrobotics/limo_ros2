@@ -1,0 +1,216 @@
+<?xml version="1.0"?>
+<!-- Autor: Zhui Li -->
+<!--E-Mail: lz554113510@gmail.com -->
+<!--Company: Institut für Intermodale Transport- und Logistiksysteme in Technische Universität Braunschweig -->
+<!-- Description: Diese xacro-Datei basiert auf Regeln und definiert Funktionen durch xacro,
+um die Erstellung der weitere Simulation für Sensoren in Gazebo ermöglichen. Es erhaltet die Makrofunktion für die
+realisierbar elektrische Komponente, also Sensoren aus Gazebo-Package. Diese Anteile konnte in anderen Datei benutzt werden. -->
+
+<robot name="limo_sensor" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- ******************************* Makrofunktion für Laser-Sensor ***************************** -->
+    <xacro:macro name="gazebo_laser" params="frame_prefix">
+        <link name='${frame_prefix}_link'>
+            <inertial>
+                <mass value="0.1"/>
+                <origin xyz="0.0 0 0" rpy="0 0 0"/>
+                <inertia
+                        ixx="1e-6" ixy="0" ixz="0"
+                        iyy="1e-6" iyz="0"
+                        izz="1e-6"
+                />
+            </inertial>
+            <visual name='laser_visual'>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <cylinder radius="0.02" length="0.01"/>
+                </geometry>
+                <material name='laser_material'>
+                    <color rgba="1 1 1 1" />
+                    <ambient>0.1 0.1 0.1 1</ambient>
+                    <diffuse>0.1 0.1 0.2 1</diffuse>
+                    <specular>0 0 0 0</specular>
+                    <emissive>0 0 0 1</emissive>
+                </material>
+            </visual>
+            <collision name='laser_collision'>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <cylinder radius="0.032" length="0.016"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <gazebo reference="${frame_prefix}_link">
+            <sensor type="ray" name="laser_sensor">
+                <visualize>false</visualize>
+                <update_rate>8</update_rate>
+                <ray>
+                    <scan>
+                        <horizontal>
+                            <samples>720</samples>
+                            <resolution>1</resolution>
+                            <min_angle>-2.09439504</min_angle> <!-- Einheit in "rad", von Hersteller -->
+                            <max_angle>2.09439504</max_angle>
+                        </horizontal>
+                    </scan>
+                    <range>
+                        <min>0.2</min>
+                        <max>8.0</max>
+                        <resolution>0.01</resolution>
+                    </range>
+                    <!-- um bessere Realität zu simulieren, wird Rauschen auch addiert -->
+                    <noise>
+                        <type>gaussian</type>
+                        <mean>0.0</mean>
+                        <stddev>0.01</stddev>
+                    </noise>
+                </ray>
+                <plugin name="gazebo_ros_laser_sensor" filename="libgazebo_ros_ray_sensor.so">
+                    <ros>
+                        <namespace>/</namespace>
+                        <remapping>~/out:=scan</remapping>
+                    </ros>
+                    <output_type>sensor_msgs/LaserScan</output_type>
+                    <min_intensity>150.0</min_intensity>
+                </plugin>
+            </sensor>
+        </gazebo>
+    </xacro:macro>
+
+    <!-- ******************************* Makrofunktion für Depth-Camera ***************************** -->
+    <xacro:macro name="gazebo_depth_camera" params="frame_prefix">
+        <link name='${frame_prefix}_link'>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <inertial>
+                <mass value="0.1"/>
+                <origin xyz="0.0 0 0" rpy="0 0 0"/>
+                <inertia
+                        ixx="1e-6" ixy="0" ixz="0"
+                        iyy="1e-6" iyz="0"
+                        izz="1e-6"
+                />
+            </inertial>
+            <visual name='depth_camera_visual'>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.02 0.06 0.015"/>
+                </geometry>
+                <material name='depth_camera_material'>
+                    <color rgba="0.75 0.75 0.75 1" />
+                    <ambient>0.1 0.1 0.1 1</ambient>
+                    <diffuse>0.1 0.1 0.2 1</diffuse>
+                    <specular>0 0 0 0</specular>
+                    <emissive>0 0 0 1</emissive>
+                </material>
+            </visual>
+            <collision name='depth_camera_collision'>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.02 0.06 0.015"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <link name="depth_link" />
+
+        <joint name="${frame_prefix}_to_camera_joint" type="fixed">
+            <origin xyz="0 0 0" rpy="-1.570796 0 -1.570796 "/>
+            <parent link="${frame_prefix}_link"/>
+            <child link="depth_link"/>
+        </joint>
+
+        <gazebo reference="${frame_prefix}_link">
+            <sensor name="sensor_camera" type="depth">
+                <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+                <always_on>true</always_on>
+                <visualize>true</visualize>
+                <update_rate>10.0</update_rate>
+                <camera name="head">
+                    <horizontal_fov>1.3962634</horizontal_fov> <!-- 60*pi/180 -->
+                    <!-- normalisieren die Form für Fotos -->
+                    <image>
+                        <width>640</width>
+                        <height>480</height>
+                        <format>R8G8B8</format>
+                    </image>
+                    <clip>
+                        <near>0.15</near>
+                        <far>8.0</far>
+                    </clip>
+                </camera>
+                <plugin name="gazebo_ros_depth_camera_sensor" filename="libgazebo_ros_camera.so">
+                    <ros>
+<!--                         <namespace>${frame_prefix}</namespace>-->
+                        <remapping>${frame_prefix}/image_raw:=rgb/image_raw</remapping>
+                        <remapping>${frame_prefix}/image_depth:=depth/image_raw</remapping>
+                        <remapping>${frame_prefix}/camera_info:=rgb/camera_info</remapping>
+                        <remapping>${frame_prefix}/camera_info_depth:=depth/camera_info</remapping>
+                        <remapping>${frame_prefix}/points:=depth/points</remapping>
+                    </ros>
+                    <camera_name>${frame_prefix}</camera_name>
+                    <frame_name>${frame_prefix}_frame_optical</frame_name>
+                    <hack_baseline>0.07</hack_baseline>
+                    <min_depth>0.001</min_depth>
+                    <max_depth>300.0</max_depth>
+                </plugin>
+            </sensor>
+        </gazebo>
+    </xacro:macro>
+
+    <!-- ******************************* Makrofunktion für IMU ***************************** -->
+    <xacro:macro name="gazebo_imu" params="frame_prefix">
+        <link name='${frame_prefix}_link'>
+            <pose>0 0 0 0 0 0</pose>
+            <inertial>
+                <mass value="0.01"/>
+                <origin xyz="0.0 0 0" rpy="0 0 0"/>
+                <inertia
+                        ixx="1e-7" ixy="0" ixz="0"
+                        iyy="1e-7" iyz="0"
+                        izz="1e-7"
+                />
+            </inertial>
+            <visual name='imu_visual'>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.001 0.001 0.001"/>
+                </geometry>
+                <material name='imu_material'>
+                    <color rgba="0.75 0.75 0.75 1" />
+                    <ambient>0.1 0.1 0.1 1</ambient>
+                    <diffuse>0.1 0.1 0.2 1</diffuse>
+                    <specular>0 0 0 0</specular>
+                    <emissive>0 0 0 1</emissive>
+                </material>
+            </visual>
+            <collision name='imu_collision'>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.001 0.001 0.001"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <gazebo reference="${frame_prefix}_link">
+            <gravity>true</gravity>
+            <sensor name="imu_sensor" type="imu">
+                <always_on>true</always_on>
+                <update_rate>100</update_rate>
+                <visualize>true</visualize>
+                <topic>__default_topic__</topic>
+                <pose>0 0 0 0 0 0</pose>
+
+                <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+                    <topicName>/limo/imu</topicName>
+                    <bodyName>${frame_prefix}_link</bodyName>
+                    <updateRateHZ>100.0</updateRateHZ>
+                    <gaussianNoise>0.001</gaussianNoise>
+                    <xyzOffset>0 0 0</xyzOffset>
+                    <rpyOffset>0 0 0</rpyOffset>
+                    <frameName>${frame_prefix}_link</frameName>
+                </plugin>
+            </sensor>
+        </gazebo>
+    </xacro:macro>
+</robot>

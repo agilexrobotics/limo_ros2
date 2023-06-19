@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--Auto: Zhui Li-->
+<!--E-Mail: lz554113510@gmail.com -->
+<!--Company: Institut für Intermodale Transport- und Logistiksysteme in Technische Universität Braunschweig -->
+<!-- Description: Diese xacro-Datei basiert auf Regeln und definiert Funktionen durch xacro,
+um die Erstellung der ganzen Struktur des Wagens in Ackerman-Type zu ermöglichen. Das Fahrzeuggrundmodell und
+andere Sensoren zusammengebaut werden und laden sie das Modell in Gazebo.-->
+
+<robot name="limo_ackermann" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:include filename="$(find limo_car)/gazebo/ackermann.xacro" />
+    <xacro:include filename="$(find limo_car)/gazebo/sensor.xacro" />
+
+
+    <!-- ************************* Laser ****************************** -->
+    <xacro:gazebo_laser frame_prefix="laser" />
+
+    <joint name="laser_joint" type="fixed">
+        <origin xyz="0.1236 0 -0.01" rpy="0 0 0"/>
+        <parent link="base_link"/>
+        <child link="laser_link"/>
+    </joint>
+    <!-- ************************* Depth-camera *********************** -->
+    <xacro:gazebo_depth_camera frame_prefix="depth_camera" />
+
+    <joint name="depth_camera_joint" type="fixed">
+        <origin xyz="0.1 0 0.065" rpy="0 0 0"/>
+        <parent link="base_link"/>
+        <child link="depth_camera_link"/>
+    </joint>
+    <!-- ************************* IMU ******************************** -->
+    <xacro:gazebo_imu frame_prefix="imu" />
+
+    <joint name="imu_joint" type="fixed">
+        <origin xyz="0.0 0 -0.1" rpy="0 0 0"/>
+        <parent link="base_link"/>
+        <child link="imu_link"/>
+    </joint>
+</robot>

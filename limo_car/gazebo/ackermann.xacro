@@ -1,0 +1,377 @@
+<?xml version="1.0"?>
+<!--Auto: Zhui Li-->
+<!--E-Mail: lz554113510@gmail.com -->
+<!--Company: Institut für Intermodale Transport- und Logistiksysteme in Technische Universität Braunschweig -->
+<!-- Description: Diese xacro-Datei basiert auf Regeln und definiert Funktionen durch xacro,
+um die Erstellung der Struktur des Wagens in Ackerman-Type zu ermöglichen. Es liegen die Karosserie des kleinen Wagens,
+die Rädern und Steuerscharnier im vorderen Achse, und auch die hinten Rädern. Das ganze System ist als eine Makrofunktion
+dargestellt. Es erhält sich noch die Funktionen über Reglung für Lenkung und Bewegung, wie die in Gazebo realisiert werden.
+Es würde einfach in andere Datei angerufen werden. -->
+
+<robot name="limo_ackermann" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- ******************************** Paramenten zu definieren ************************************* -->
+    <!-- *********************************************************************************************** -->
+    <!-- definiert Value -->
+    <xacro:property name="M_PI" value="3.14159"/>
+
+    <!-- das Value sind all gemessen -->
+    <xacro:property name="base_mass" value="4.34"/>
+    <xacro:property name="base_x_size" value="0.19" />
+    <xacro:property name="base_y_size" value="0.31" />
+    <xacro:property name="base_z_size" value="0.12" />
+
+    <xacro:property name="wheelbase" value="0.24"/>
+    <xacro:property name="track" value="0.168"/>
+    <xacro:property name="wheel_vertical_offset" value="-0.10" />
+
+    <xacro:property name="wheel_mass" value="0.5" />
+    <xacro:property name="wheel_length" value="0.045" />
+    <xacro:property name="wheel_radius" value="0.045" />
+
+    <!-- definieren die Macro-Function für die Rechnungen der Matrizen für Trägheitsmoment-->
+    <!-- Zylinder -->
+    <xacro:macro name="cylinder_inertial_matrix" params="m r h">
+        <inertial>
+            <origin xyz="0.0 0.0 0.0" />
+            <mass value="${m}" />
+            <inertia ixx="${m*(3*r*r+h*h)/12}" ixy = "0" ixz = "0"
+                     iyy="${m*(3*r*r+h*h)/12}" iyz = "0"
+                     izz="${m*r*r/2}" />
+        </inertial>
+    </xacro:macro>
+    <!-- Quader -->
+    <xacro:macro name="box_inertial_matrix" params="m w l h">
+        <inertial>
+            <origin xyz="0.0 0.0 0.0" />
+            <mass value="${m}" />
+            <inertia ixx="${m*(w*w+h*h)/12}" ixy = "0" ixz = "0"
+                     iyy="${m*(h*h+l*l)/12}" iyz = "0"
+                     izz="${m*(w*w+l*l)/12}" />
+        </inertial>
+    </xacro:macro>
+    <!-- *********************************************************************************************** -->
+    <!-- *********************************************************************************************** -->
+
+
+    <!-- **************************** Makrofunktion zu definieren ************************************** -->
+    <!-- *********************************************************************************************** -->
+    <!-- Makrofunktion für vorderen Räder mit Steuerscharnier-->
+    <!-- front left -->
+    <xacro:macro name="limo_left_steering_hinge" params="parent_prefix wheel_prefix *joint_pose">
+        <link name="${wheel_prefix}_steer_link">
+            <inertial>
+                <!-- diese Daten kommen aus den Herstellern -->
+                <mass value="0.25" />
+                <inertia ixx="0.00525" ixy="0" ixz="0" iyy="0.00035" iyz="0" izz="0.00525" />
+                <origin xyz="0 0 0" />
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <!-- es ist sehr klein, einfach als Klein definiert wird -->
+                    <cylinder length="0.0001" radius="0.0001" />
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0 ${wheel_length/2} 0" rpy="${M_PI/2} 0 0" />
+                <geometry>
+                    <cylinder length="${wheel_length}" radius="${wheel_radius-0.01}" />
+                </geometry>
+            </collision>
+        </link>
+
+        <joint name="${wheel_prefix}_steer_joint" type="revolute">
+            <parent link="${parent_prefix}"/>
+            <child link="${wheel_prefix}_steer_link"/>
+            <xacro:insert_block name="joint_pose"/>
+            <axis xyz="0 0 1" />
+            <!-- Paramenten von Herstellern -->
+            <limit lower="-0.523598767" upper="0.523598767" effort="5" velocity="0.5" />
+            <dynamics damping="1.0" friction="2.0"/>
+        </joint>
+
+        <transmission name="${wheel_prefix}_hinge_trans" type="SimpleTransmission">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="${wheel_prefix}_hinge_motor">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+            <joint name="${wheel_prefix}_steer_joint">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            </joint>
+        </transmission>
+
+        <link name="${wheel_prefix}_wheel_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="$(find limo_car)/meshes/limo_wheel.dae" scale="1.2 1.2 1.2"/>
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0 ${wheel_length/2} 0" rpy="${M_PI/2} 0 0" />
+                <geometry>
+                    <cylinder length="${wheel_length}" radius="${wheel_radius}" />
+                </geometry>
+            </collision>
+            <xacro:cylinder_inertial_matrix  m="${wheel_mass}" r="${wheel_radius}"  h="${wheel_length}" />
+        </link>
+
+        <joint name="${wheel_prefix}_wheel_joint" type="continuous">
+            <parent link="${wheel_prefix}_steer_link"/>
+            <child link="${wheel_prefix}_wheel_link"/>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <axis xyz="0 1 0"/>
+        </joint>
+
+        <transmission name="${wheel_prefix}_wheel_trans" type="SimpleTransmission">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="${wheel_prefix}_wheel_motor">
+                <!-- Type für den Topic(Paramenten) -->
+                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+            <joint name="${wheel_prefix}_wheel_joint">
+                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+            </joint>
+        </transmission>
+    </xacro:macro>
+
+    <!-- front right -->
+    <xacro:macro name="limo_right_steering_hinge" params="parent_prefix wheel_prefix *joint_pose">
+        <link name="${wheel_prefix}_steer_link">
+            <inertial>
+                <mass value="0.25" />
+                <inertia ixx="0.00525" ixy="0" ixz="0" iyy="0.00035" iyz="0" izz="0.00525" />
+                <origin xyz="0 0 0" />
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <cylinder length="0.0001" radius="0.0001" />
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0 ${wheel_length/2} 0" rpy="${M_PI/2} 0 0" />
+                <geometry>
+                    <cylinder length="${wheel_length}" radius="${wheel_radius-0.01}" />
+                </geometry>
+            </collision>
+        </link>
+
+        <joint name="${wheel_prefix}_steer_joint" type="revolute">
+            <parent link="${parent_prefix}"/>
+            <child link="${wheel_prefix}_steer_link"/>
+            <xacro:insert_block name="joint_pose"/>
+            <axis xyz="0 0 -1"/>
+            <limit lower="-0.523598767" upper="0.523598767" effort="5" velocity="0.5" />
+            <dynamics damping="1.0" friction="2.0"/>
+        </joint>
+
+        <transmission name="${wheel_prefix}_hinge_trans" type="SimpleTransmission">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="${wheel_prefix}_hinge_motor">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+            <joint name="${wheel_prefix}_steer_joint">
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            </joint>
+        </transmission>
+
+        <link name="${wheel_prefix}_wheel_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="$(find limo_car)/meshes/limo_wheel.dae" scale="1.2 1.2 1.2" />
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0 ${wheel_length/2} 0" rpy="${M_PI/2} 0 0" />
+                <geometry>
+                    <cylinder length="${wheel_length}" radius="${wheel_radius}" />
+                </geometry>
+            </collision>
+            <xacro:cylinder_inertial_matrix  m="${wheel_mass}" r="${wheel_radius}"  h="${wheel_length}" />
+        </link>
+
+        <joint name="${wheel_prefix}_wheel_joint" type="continuous">
+            <parent link="${wheel_prefix}_steer_link"/>
+            <child link="${wheel_prefix}_wheel_link"/>
+            <origin xyz="0 0 0" rpy="0 0  0" />
+            <axis xyz="0 -1 0"/>
+        </joint>
+
+        <transmission name="${wheel_prefix}_wheel_trans" type="SimpleTransmission">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="${wheel_prefix}_wheel_motor">
+                <!-- Type für den Topic(Paramenten) -->
+                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+            <joint name="${wheel_prefix}_wheel_joint">
+                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+            </joint>
+        </transmission>
+    </xacro:macro>
+    <!-- *********************************************************************************************** -->
+    <!-- *********************************************************************************************** -->
+
+
+
+    <!-- ***************************************** Base zu bauen *************************************** -->
+    <!-- *********************************************************************************************** -->
+    <!-- erstellt Hauptanteil des Modells, definiert ein Nullpunkt, um Modell aufzubauen. Es ist einfach für weitere
+    Darstellungspostion in Simulation-Umgebung -->
+    <xacro:macro name="limo_ackermann">
+        <!-- <link name="base_footprint"/>
+
+        <joint name="base_joint" type="fixed">
+            <parent link="base_footprint"/>
+            <child link="base_link"/>
+            <origin xyz="0.0 0.0 0.15" rpy="0 0 0"/>
+        </joint> -->
+
+        <!-- herstellt base_link -->
+        <link name="base_link">
+            <visual>
+                <origin xyz="0 0 -0.15" rpy="0 0 ${M_PI/2}" />
+                <geometry>
+                    <!-- Modell von Hersteller, aber es ist kleiner als realen Produkt, da die Skale vergrößert wird -->
+                    <mesh filename="$(find limo_car)/meshes/limo_base.dae" scale="1.2 1.2 1.2" />
+                </geometry>
+            </visual>
+            <!-- Modell für physikalische Kollision zu modellieren. -->
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <box size="${base_x_size} ${base_y_size} ${base_z_size}"/>
+                </geometry>
+            </collision>
+            <xacro:box_inertial_matrix  m="${base_mass}" w="${base_x_size}" l="${base_y_size}" h="${base_z_size}" />
+        </link>
+
+        <gazebo reference="base_link">
+            <material>
+                <color rgba="0 0 0 0.5"/>
+            </material>
+        </gazebo>
+
+        <!-- hinten Räder -->
+        <link name="rear_left_wheel_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="$(find limo_car)/meshes/limo_wheel.dae" scale="1.2 1.2 1.2"/>
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0 ${wheel_length/2} 0" rpy="${M_PI/2} 0 0" />
+                <geometry>
+                    <cylinder length="${wheel_length}" radius="${wheel_radius}" />
+                </geometry>
+            </collision>
+            <xacro:cylinder_inertial_matrix  m="${wheel_mass}" r="${wheel_radius}" h="${wheel_length}"/>
+        </link>
+
+        <joint name="rear_left_wheel_joint" type="continuous">
+            <parent link="base_link"/>
+            <child link="rear_left_wheel_link"/>
+            <origin xyz="${-wheelbase/2} ${track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
+            <axis xyz="0 1 0"/>
+        </joint>
+
+        <transmission name="rear_left_wheel_trans" type="SimpleTransmission">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="rear_left_wheel_motor">
+                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+            <joint name="rear_left_wheel_joint">
+                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+            </joint>
+        </transmission>
+
+        <link name="rear_right_wheel_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="$(find limo_car)/meshes/limo_wheel.dae" scale="1.2 1.2 1.2"/>
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0 ${wheel_length/2} 0" rpy="${M_PI/2} 0 0" />
+                <geometry>
+                    <cylinder length="${wheel_length}" radius="${wheel_radius}" />
+                </geometry>
+            </collision>
+            <xacro:cylinder_inertial_matrix  m="${wheel_mass}" r="${wheel_radius}" h="${wheel_length}"/>
+        </link>
+
+        <joint name="rear_right_wheel_joint" type="continuous">
+            <parent link="base_link"/>
+            <child link="rear_right_wheel_link"/>
+            <origin xyz="${-wheelbase/2} ${-track/2} ${wheel_vertical_offset}" rpy="${M_PI} 0 0" />
+            <axis xyz="0 -1 0"/>
+        </joint>
+
+        <transmission name="rear_right_wheel_trans" type="SimpleTransmission">
+            <type>transmission_interface/SimpleTransmission</type>
+            <actuator name="rear_right_wheel_motor">
+                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+            <joint name="rear_right_wheel_joint">
+                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+            </joint>
+        </transmission>
+
+        <!-- ruft Steuerscharnier mit vorderem Räder auf -->
+        <xacro:limo_left_steering_hinge parent_prefix="base_link" wheel_prefix="front_left">
+            <origin xyz="${wheelbase/2} ${track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
+        </xacro:limo_left_steering_hinge>
+
+        <xacro:limo_right_steering_hinge parent_prefix="base_link" wheel_prefix="front_right">
+            <origin xyz="${wheelbase/2} ${-track/2} ${wheel_vertical_offset}" rpy="${M_PI} 0 0" />
+        </xacro:limo_right_steering_hinge>
+
+        <!-- ********************************** Kontrolle zu erstellen ************************************* -->
+        <!-- *********************************************************************************************** -->
+        <gazebo>
+            <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so" />
+            <plugin name="ackermann_controller" filename="libgazebo_ros_ackermann_drive.so">
+                <update_rate>100</update_rate>
+                <front_left_joint>front_left_wheel_joint</front_left_joint>
+                <front_right_joint>front_right_wheel_joint</front_right_joint>
+                <rear_left_joint>rear_left_wheel_joint</rear_left_joint>
+                <rear_right_joint>rear_right_wheel_joint</rear_right_joint>
+                <left_steering_joint>front_left_steer_joint</left_steering_joint>
+                <right_steering_joint>front_right_steer_joint</right_steering_joint>
+                <steering_wheel_joint>/</steering_wheel_joint> 
+
+                <left_steering_pid_gain>10000 100 10</left_steering_pid_gain>
+                <left_steering_i_rang>0 0</left_steering_i_rang>
+                <right_steering_pid_gain>10000 100 10</right_steering_pid_gain>
+                <right_steering_i_rang>0 0</right_steering_i_rang>
+                <linear_velocity_pid_gain>0.5 10 0.001</linear_velocity_pid_gain>
+                <linear_velocity_i_range>0 0</linear_velocity_i_range>
+
+                <max_steer>0.523598767</max_steer> 
+
+                <wheel_separation>0.172</wheel_separation> 
+                <wheel_diameter>0.09</wheel_diameter> 
+                <max_wheel_torque>20</max_wheel_torque>
+                <max_wheel_acceleration>1.0</max_wheel_acceleration>
+                <command_topic>cmd_vel</command_topic>
+                <publish_odom>true</publish_odom>
+                <publish_odom_tf>true</publish_odom_tf>
+                <publish_wheel_tf>true</publish_wheel_tf>
+                <odometry_topic>odom</odometry_topic>
+                <odometry_frame>odom</odometry_frame>
+                <robot_base_frame>base_footprint</robot_base_frame>
+                <odometry_source>1</odometry_source>
+            </plugin>
+        </gazebo>
+    </xacro:macro>
+</robot>
