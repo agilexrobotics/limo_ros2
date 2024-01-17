@@ -15,7 +15,7 @@ def generate_launch_description():
   # Constants for paths to different files and folders
   gazebo_models_path = 'models'
   package_name = 'limo_description'
-  robot_name_in_model = 'limo_description'
+  robot_name_in_model = 'limo_gazebo'
   rviz_config_file_path = 'rviz/urdf.rviz'
   urdf_file_path = 'urdf/limo_four_diff.xacro'
   world_file_path = 'worlds/neighborhood.world'
