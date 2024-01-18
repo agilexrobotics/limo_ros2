@@ -15,7 +15,7 @@ def generate_launch_description():
   # Constants for paths to different files and folders
   gazebo_models_path = 'models'
   package_name = 'limo_description'
-  robot_name_in_model = 'limo_gazebo'
+  robot_name_in_model = 'limo_gazebo.gazebo'
   rviz_config_file_path = 'rviz/urdf.rviz'
   urdf_file_path = 'urdf/limo_four_diff.xacro'
   world_file_path = 'worlds/neighborhood.world'
@@ -35,8 +35,10 @@ def generate_launch_description():
   default_rviz_config_path = os.path.join(pkg_share, rviz_config_file_path)
   world_path = os.path.join(pkg_share, world_file_path)
   gazebo_models_path = os.path.join(pkg_share, gazebo_models_path)
-  os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path
- 
+  if 'GAZEBO_MODEL_PATH' in os.environ:
+    os.environ['GAZEBO_MODEL_PATH'] += gazebo_models_path
+  else:
+    os.environ['GAZEBO_MODEL_PATH'] = gazebo_models_path 
   # Launch configuration variables specific to simulation
   use_sim_time = LaunchConfiguration('use_sim_time', default='true')
   gui = LaunchConfiguration('gui')
