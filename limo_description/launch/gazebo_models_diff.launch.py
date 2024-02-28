@@ -129,7 +129,7 @@ def generate_launch_description():
     parameters=[{'use_sim_time': use_sim_time}])
   # start_dummy_sensors=Node(
   #   package='dummy_sensors', 
-  #   node_executable='dummy_joint_states', 
+  #   executable='dummy_joint_states', 
   #   output='screen')
 
   # Launch RViz

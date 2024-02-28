@@ -15,7 +15,7 @@ def generate_launch_description():
         ),
         launch_ros.actions.Node(
             package='teleop_twist_keyboard',
-            node_executable='teleop_twist_keyboard',
+            executable='teleop_twist_keyboard',
             name='teleop_twist',
             # parameters=[
             #     {

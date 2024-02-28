@@ -37,7 +37,7 @@ def generate_launch_description():
 
     driver_node = LifecycleNode(
         package='ydlidar_ros2_driver',
-        node_executable='ydlidar_ros2_driver_node',
+        executable='ydlidar_ros2_driver_node',
         node_name='ydlidar_ros2_driver_node',
         output='screen',
         emulate_tty=True,
@@ -46,7 +46,7 @@ def generate_launch_description():
     )
     tf2_node = Node(
         package='tf2_ros',
-        node_executable='static_transform_publisher',
+        executable='static_transform_publisher',
         node_name='static_tf_pub_laser',
         arguments=[
             '0', '0', '0.02', '0', '0', '0', '1', 'base_link', 'laser_frame'
