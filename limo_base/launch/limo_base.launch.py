@@ -36,7 +36,7 @@ def generate_launch_description():
     
     limo_base_node = launch_ros.actions.Node(
         package='limo_base',
-        node_executable='limo_base',  #foxy executable='limo_base',
+        executable='limo_base',  #foxy executable='limo_base',
         output='screen',
         emulate_tty=True,
         parameters=[{
