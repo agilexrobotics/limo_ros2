@@ -55,16 +55,6 @@ LimoDriver::LimoDriver(std::string node_name):rclcpp::Node(node_name),keep_runni
     std::cout << "- base frame name: " << base_frame_ << std::endl;
     std::cout << "- odom topic name: " << pub_odom_tf_ << std::endl;
         
-    // ros::NodeHandle nh;createQuaternionFromRPY
-    // ros::NodeHandle private_nh("~");
-    
-    // private_nh.param<std::string>("port_name", port_name, std::string("ttyTHS1"));
-    // private_nh.param<std::string>("odom_frame", odom_frame_, std::string("odom"));
-    // private_nh.param<std::string>("base_frame", base_frame_, std::string("base_link"));
-    // private_nh.param<bool>("pub_odom_tf", pub_odom_tf_, false);
-    // private_nh.param<bool>("use_mcnamu", use_mcnamu_, false);
-    
-    // std::cout << "TEST:0 " << std::endl;
     if(use_mcnamu_) {
         motion_mode_ = MODE_MCNAMU;
     }
@@ -76,17 +66,17 @@ LimoDriver::LimoDriver(std::string node_name):rclcpp::Node(node_name),keep_runni
     motion_cmd_sub_= this->create_subscription<geometry_msgs::msg::Twist>(
         "/cmd_vel",10,std::bind(&LimoDriver::twistCmdCallback,this,std::placeholders::_1));
 
-    // odom_publisher_ = nh.advertise<nav_msgs::Odometry>("/odom", 50, true);
-    // status_publisher_ = nh.advertise<limo_base::LimoStatus>("/limo_status", 10, true);
-    // imu_publisher_ = nh.advertise<sensor_msgs::Imu>("/imu", 10, true);
-    // motion_cmd_sub_ = nh.subscribe<geometry_msgs::Twist>("/cmd_vel", 5, &LimoDriver::twistCmdCallback, this);
-    
     // connect to the serial port
     if (port_name.find("tty") != port_name.npos){ 
         port_name = "/dev/" + port_name;
         keep_running_=true;
         this->connect(port_name, B460800);
         this->enableCommandedMode();
+        if(use_mcnamu_) {
+            motion_mode_ = MODE_MCNAMU;
+            enableMcMode();
+        }
+
         RCLCPP_INFO(this->get_logger(),"Open the serial port:'%s'",port_name.c_str());
         
 
@@ -99,12 +89,6 @@ LimoDriver::~LimoDriver() {
 
 void LimoDriver::run(){
 
-//     if (port_name.find("tty") != port_name.npos){ 
-//         port_name = "/dev/" + port_name;
-//         connect(port_name, B460800);
-//         enableCommandedMode();
-//         RCLCPP_INFO(this->get_logger(),"Open the serial port:'%s'",port_name.c_str());
-//     }
 }
 double LimoDriver::degToRad(double deg) {
     
@@ -388,6 +372,23 @@ void LimoDriver::enableCommandedMode() {
     RCLCPP_INFO(this->get_logger(),"enableCommandedMode :");
 }
 
+void LimoDriver::enableMcMode()
+{
+    LimoFrame frame;
+    frame.id = MSG_CTRL_MODE_CONFIG_ID;
+    frame.data[0] = 0x01;
+    frame.data[1] = 0;
+    frame.data[2] = 0x01;
+    frame.data[3] = 0;
+    frame.data[4] = 0;
+    frame.data[5] = 0;
+    frame.data[6] = 0;
+    frame.data[7] = 0;
+
+    sendFrame(frame);
+    RCLCPP_INFO(this->get_logger(),"use_mcnamu :");
+
+}
 void LimoDriver::setMotionCommand(double linear_vel, double angular_vel,
                                   double lateral_velocity, double steering_angle) {
     LimoFrame frame;

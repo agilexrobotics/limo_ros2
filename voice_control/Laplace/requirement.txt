@@ -1,7 +1,0 @@
-pytest
-loguru
-swig
-pyaudio
-pocketsphinx
-SpeechRecognition
-pyttsx3

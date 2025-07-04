@@ -74,6 +74,8 @@ private:
     void setMotionCommand(double linear_vel, double steer_angle,
                           double lateral_vel, double angular_vel);
     void enableCommandedMode();
+    void enableMcMode();
+
     void processErrorCode(uint16_t error_code);
     void twistCmdCallback(const geometry_msgs::msg::Twist::SharedPtr msg);
     double normalizeAngle(double angle);
