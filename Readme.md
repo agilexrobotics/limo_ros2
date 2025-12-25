@@ -45,11 +45,12 @@ Download and install teleop-twist-keyboard
 ###  Download package and Build
 
 ```
-mkdir -p catkin_ws/src
-cd catkin_ws/src
+mkdir -p limo_ros2_ws/src
+cd limo_ros2_ws/src
 git clone https://github.com/agilexrobotics/limo_ros2.git
-cd catkin_ws
+cd limo_ros2_ws
 colcon build
+source install/setup.bash
 ```
 
 ## Usage
@@ -66,11 +67,13 @@ Start the keyboard teleop node
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ```
 
-# statement
+# Statement
 
-The limo_car gazebo simulation function package is provided by us and the Institute for **Intermodal Transport and Logistics SystemsTU Braunschweig, Germany **jointly developed, thanks for their efforts
+The limo_car gazebo simulation function package is provided by agilexrobotics and the Institute for **Intermodal Transport and Logistics SystemsTU Braunschweig, Germany **jointly developed, thanks for their efforts
 
-
+# Author
+Name: Anshika Sinha
+Email: anshikasinha218@gmail.com 
 
 
 
