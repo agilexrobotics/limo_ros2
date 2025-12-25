@@ -47,7 +47,7 @@ Download and install teleop-twist-keyboard
 ```
 mkdir -p limo_ros2_ws/src
 cd limo_ros2_ws/src
-git clone https://github.com/agilexrobotics/limo_ros2.git
+git clone [https://github.com/agilexrobotics/limo_ros2.git](https://github.com/anshikasinha8/limo_ros2.git)
 cd limo_ros2_ws
 colcon build
 source install/setup.bash
