@@ -24,7 +24,7 @@ if(BUILD_TESTING)
 endif()
 
 install(
-  DIRECTORY launch  gazebo log meshes rviz src urdf worlds 
+  DIRECTORY launch  gazebo meshes rviz src urdf 
   DESTINATION share/${PROJECT_NAME}
 )
 
