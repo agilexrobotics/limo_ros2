@@ -1,4 +1,4 @@
-# Limo ROS2 Humble
+# Limo ROS2 Jazzy
 
 ## 1. Introduction of Function Package
 
@@ -7,6 +7,7 @@
     ├── limo_base
     ├── limo_bringup
     ├── limo_car
+    ├── limo_description
     ├── limo_msgs
     └── Readme.md
 
@@ -14,9 +15,11 @@
 
 limo_base ：This folder is the driver package
 
-limo_bringup：This folder stores some launch files
+limo_bringup：This folder stores some launch files and ros-gazebo bridge config
 
 limo_car：The folder is gazebo simulation function package
+
+limo_description: Contains robot description files and rviz config
 
 limo_msgs：This folder is some message files
 
@@ -24,7 +27,7 @@ limo_msgs：This folder is some message files
 
 ### Development Environment
 
- ubuntu 22.04 + [ROS2 Humble desktop full](http://docs.ros.org/en/humble/Installation/Alternatives/Ubuntu-Development-Setup.html)
+ ubuntu 24.04 + [ROS2 Jazzy desktop full](https://docs.ros.org/en/jazzy/Installation.html)
 
 ### Download and install required function package
 
@@ -32,12 +35,6 @@ Download and install joint-state-publisher-gui package.This package is used to v
 
 ```
 sudo apt-get install ros-humble-joint-state-publisher-gui 
-```
-
-Download and install rqt-robot-steering plug-in, rqt_robot_steering is a ROS tool closely related to robot motion control, it can send the control command of robot linear motion and steering motion, and the robot motion can be easily controlled through the sliding bar
-
-```
-sudo apt-get install ros-humble-rqt-robot-steering 
 ```
 
 Download and install teleop-twist-keyboard
@@ -55,10 +52,10 @@ source install/setup.bash
 
 ## Usage
 
-Start the base node for limo
+Start the launch file for limo
 
 ```
-ros2 launch limo_base limo_base.launch.py 
+ros2 launch limo_bringup limo_gazebo.launch.xml 
 ```
 
 Start the keyboard teleop node
